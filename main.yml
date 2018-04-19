@@ -1,0 +1,40 @@
+---
+- name: install docker
+  hosts: all
+  become: yes
+  roles:
+    - angstwad.docker_ubuntu
+  tags: docker_install
+
+- hosts: server
+  vars:
+    data_file_path: "{{ workdir }}/{{ data_file_name }}"
+  tasks:
+    - name: delete obsolate data file
+      file:
+        path: "{{ data_file_path }}"
+        state: absent
+    - name: ensure parent folder for data file
+      file:
+        path: "{{ workdir }}"
+        state: directory
+    - name: create data file for read by the iPerf3 server
+      command: fallocate -l {{ data_file_size }} {{ data_file_path }}
+    - name: start the iPerf3 server
+      docker_container:
+        cleanup: yes
+        command: >
+          /root/results/server_iperf3.log
+          --server
+          --file /root/results/{{ data_file_name }}
+          --bind "$(ifconfig {{ server_outbound_interface }} | grep -oP 'inet addr:\K\S+')"
+        detach: yes
+        force_kill: yes
+        image: ljishen/iperf3
+        name: iperf3
+        network_mode: host
+        pull: yes
+        recreate: yes
+        state: started
+        volumes:
+          - "{{ workdir }}:/root/results"
