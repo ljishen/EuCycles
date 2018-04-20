@@ -83,8 +83,3 @@
       loop: "{{ transmission_size }}"
       loop_control:
         loop_var: bytes
-  handlers:
-    - name: drop file cache
-      # See https://www.kernel.org/doc/Documentation/sysctl/vm.txt
-      shell: sync && echo 3 > /proc/sys/vm/drop_caches
-      delegate_to: "{{ hostvars[groups['server'][0]]['inventory_hostname'] }}"

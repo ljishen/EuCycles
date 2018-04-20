@@ -23,7 +23,6 @@
       - /usr/lib/x86_64-linux-gnu/libsctp.so.1:/usr/lib/x86_64-linux-gnu/libsctp.so.1:ro
       - /lib/x86_64-linux-gnu/libcrypto.so.1.0.0:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0:ro
   register: perf_output
-  notify: drop file cache
 - name: ensure presence of dir logs
   file:
     path: "{{ workdir }}/logs"
@@ -35,3 +34,7 @@
     content: "{{ perf_output.ansible_facts.docker_container.Output }}"
     dest: "{{ workdir }}/logs/perf_iPerf3_{{ bytes }}.log"
     force: yes
+- name: drop file cache
+  # See https://www.kernel.org/doc/Documentation/sysctl/vm.txt
+  shell: sync && echo 3 > /proc/sys/vm/drop_caches
+  delegate_to: "{{ hostvars[groups['server'][0]]['inventory_hostname'] }}"
