@@ -78,33 +78,11 @@
   become: yes
   any_errors_fatal: true
   tasks:
-    - name: start the iPerf3 client
-      docker_container:
-        capabilities: SYS_ADMIN
-        cleanup: yes
-        command: >
-          stat /root/iperf3/src/iperf3
-          --client {{ hostvars[groups['server'][0]]['ansible_' + server_outbound_interface]['ipv4']['address'] }}
-          --bind {{ hostvars[groups['client'][0]]['ansible_' + client_incoming_interface]['ipv4']['address'] }}
-          --reverse --affinity 4 --verbose --length 128k --parallel 1 --bytes 10m
-        detach: false
-        env:
-          LD_LIBRARY_PATH: /root/iperf3/src/.libs
-        force_kill: yes
-        image: ljishen/perf
-        name: perf
-        network_mode: host
-        pull: yes
-        recreate: yes
-        state: started
-        volumes:
-          - "{{ iperf3_abs_dir.stdout }}:/root/iperf3:ro"
-          - /usr/lib/x86_64-linux-gnu/libsctp.so.1:/usr/lib/x86_64-linux-gnu/libsctp.so.1:ro
-          - /lib/x86_64-linux-gnu/libcrypto.so.1.0.0:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0:ro
-      register: perf_res
-      notify: drop file cache
-    - name: print
-      debug: var="{{ perf_res }}"
+    - name: perf stat the iPerf3 client
+      include_tasks: library/perf_iperf3_client.yml
+      loop: "{{ transmission_size }}"
+      loop_control:
+        loop_var: bytes
   handlers:
     - name: drop file cache
       # See https://www.kernel.org/doc/Documentation/sysctl/vm.txt
