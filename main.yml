@@ -51,7 +51,7 @@
         mode: u+x
         url: https://raw.githubusercontent.com/ljishen/BSFD/master/benchmarks/iperf3/run.sh
     - name: delete obsolate installation dirs of iPerf3
-      shell: rm -rf {{ workdir }}/iperf-3.*
+      shell: rm -rf {{ workdir }}/iperf-3*
       args:
         warn: no
     - name: install iPerf3 to {{ workdir }}
@@ -63,6 +63,15 @@
       # if we upgraded the version of iPerf3
       shell: realpath {{ workdir }}/iperf-3.*
       register: iperf3_abs_dir
+    - name: generate the {{ iperf3_abs_dir.stdout }}/src/.libs/lt-iperf3
+      # This step can't be postponed until the execution inside the container
+      # because the execution program is generated during the installation
+      # and some configuration pathes does not match within the container.
+      # The following errors will be shown if this step is omitted:
+      #   iperf-3.5/src/iperf3: line 202: cd: /home/cc/workdir/iperf-3.5/src: No such file or directory
+      #   iperf-3.5/src/iperf3: line 202: gcc: command not found
+      # See the script: {{ iperf3_abs_dir.stdout }}/src/iperf3
+      command: "{{ iperf3_abs_dir.stdout }}/src/iperf3 --version"
 
 - name: run tests
   hosts: client
