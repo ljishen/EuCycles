@@ -1,5 +1,6 @@
 ---
 - name: "test of transmission size: {{ bytes }}"
+  become: yes
   docker_container:
     capabilities: SYS_ADMIN
     cleanup: yes
@@ -24,17 +25,20 @@
       - /lib/x86_64-linux-gnu/libcrypto.so.1.0.0:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0:ro
   register: perf_output
 - name: ensure presence of dir logs
-  file:
+  local_action:
+    module: file
     path: "{{ workdir }}/logs"
     state: directory
   run_once: true
 - name: "save output for transmission size: {{ bytes }}"
-  copy:
+  local_action:
+    module: copy
     backup: yes
     content: "{{ perf_output.ansible_facts.docker_container.Output }}"
     dest: "{{ workdir }}/logs/perf_iPerf3_{{ bytes }}.log"
     force: yes
 - name: drop file cache
+  become: yes
   # See https://www.kernel.org/doc/Documentation/sysctl/vm.txt
   shell: sync && echo 3 > /proc/sys/vm/drop_caches
   delegate_to: "{{ hostvars[groups['server'][0]]['inventory_hostname'] }}"
