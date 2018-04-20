@@ -1,20 +1,19 @@
 ---
-- name: install docker
+- name: ensure all prerequisites
   hosts: all
-  become: yes
   roles:
-    - angstwad.docker_ubuntu
-  tags: docker_install
+    - { role: angstwad.docker_ubuntu, become: yes, tags: 'install_docker' }
+  tasks:
+    - name: ensure the presence of workdir {{ workdir }}
+      file:
+        path: "{{ workdir }}"
+        state: directory
 
 - name: deploy iPerf3 server
   hosts: server
   vars:
     data_file_path: "{{ workdir }}/{{ data_file_name }}"
   tasks:
-    - name: ensure the presence of workdir {{ workdir }}
-      file:
-        path: "{{ workdir }}"
-        state: directory
     - name: delete obsolate data file
       file:
         path: "{{ data_file_path }}"
@@ -40,3 +39,65 @@
         state: started
         volumes:
           - "{{ workdir }}:/root/results"
+
+- name: install iPerf3 to client
+  hosts: client
+  any_errors_fatal: true
+  tasks:
+    - name: download iPerf3 installer
+      get_url:
+        dest: "{{ workdir }}"
+        force: yes
+        mode: u+x
+        url: https://raw.githubusercontent.com/ljishen/BSFD/master/benchmarks/iperf3/run.sh
+    - name: delete obsolate installation dirs of iPerf3
+      shell: rm -rf {{ workdir }}/iperf-3.*
+      args:
+        warn: no
+    - name: install iPerf3 to {{ workdir }}
+      shell: yes | ./run.sh --install
+      args:
+        chdir: "{{ workdir }}"
+    - name: get absolute installation dir of iPerf3
+      # This step ensures we can find installation dir even
+      # if we upgraded the version of iPerf3
+      shell: realpath {{ workdir }}/iperf-3.*
+      register: iperf3_abs_dir
+
+- name: run tests
+  hosts: client
+  become: yes
+  any_errors_fatal: true
+  tasks:
+    - name: start the iPerf3 client
+      docker_container:
+        capabilities: SYS_ADMIN
+        cleanup: yes
+        command: >
+          stat /root/iperf3/src/iperf3
+          --client {{ hostvars[groups['server'][0]]['ansible_' + server_outbound_interface]['ipv4']['address'] }}
+          --bind {{ hostvars[groups['client'][0]]['ansible_' + client_incoming_interface]['ipv4']['address'] }}
+          --reverse --affinity 4 --verbose --length 128k --parallel 1 --bytes 10m
+        detach: false
+        env:
+          LD_LIBRARY_PATH: /root/iperf3/src/.libs
+        force_kill: yes
+        image: ljishen/perf
+        name: perf
+        network_mode: host
+        pull: yes
+        recreate: yes
+        state: started
+        volumes:
+          - "{{ iperf3_abs_dir.stdout }}:/root/iperf3:ro"
+          - /usr/lib/x86_64-linux-gnu/libsctp.so.1:/usr/lib/x86_64-linux-gnu/libsctp.so.1:ro
+          - /lib/x86_64-linux-gnu/libcrypto.so.1.0.0:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0:ro
+      register: perf_res
+      notify: drop file cache
+    - name: print
+      debug: var="{{ perf_res }}"
+  handlers:
+    - name: drop file cache
+      # See https://www.kernel.org/doc/Documentation/sysctl/vm.txt
+      shell: sync && echo 3 > /proc/sys/vm/drop_caches
+      delegate_to: "{{ hostvars[groups['server'][0]]['inventory_hostname'] }}"
