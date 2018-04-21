@@ -76,6 +76,19 @@
 - name: run tests
   hosts: client
   tasks:
+    - name: ensure the presence of log dir
+      local_action:
+        module: file
+        path: "{{ workdir }}/logs"
+        state: directory
+    - name: create the result file
+      local_action:
+        # Use the copy module to backup the old file if necessary
+        module: copy
+        backup: yes
+        content: ""
+        dest: "{{ workdir }}/{{ result_file_prefix }}.csv"
+        force: yes
     - include_tasks: include/perf_iperf3_client.yml
       loop: "{{ transmission_size }}"
       loop_control:

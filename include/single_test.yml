@@ -1,5 +1,5 @@
 ---
-- name: ({{ index }} time, size {{ bytes }}) run iPerf3 client
+- name: (index {{ index }}, size {{ bytes }}) run iPerf3 client
   become: yes
   docker_container:
     capabilities: SYS_ADMIN
@@ -24,13 +24,20 @@
       - /usr/lib/x86_64-linux-gnu/libsctp.so.1:/usr/lib/x86_64-linux-gnu/libsctp.so.1:ro
       - /lib/x86_64-linux-gnu/libcrypto.so.1.0.0:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0:ro
   register: perf_output
-- name: ({{ index }} time, size {{ bytes }}) save output
+- name: (index {{ index }}, size {{ bytes }}) save output
   local_action:
     module: copy
     backup: yes
     content: "{{ perf_output.ansible_facts.docker_container.Output }}"
     dest: "{{ workdir }}/logs/perf_iPerf3_{{ bytes }}_{{ index }}.log"
     force: yes
+- name: (index {{ index }}, size {{ bytes }}) extract data
+  local_action: >
+    command
+    scripts/extract2csv.sh
+    {{ workdir }}/logs/perf_iPerf3_{{ bytes }}_{{ index }}.log
+    {{ workdir }}/{{ result_file_prefix }}.csv
+    {{ bytes if index == '1' else '' }}
 - name: drop file cache
   become: yes
   # See https://www.kernel.org/doc/Documentation/sysctl/vm.txt
