@@ -1,5 +1,5 @@
 ---
-- name: (index {{ index }}, size {{ bytes }}) run iPerf3 client
+- name: (index {{ index }}/{{ repetition }}, size {{ bytes }}) run iPerf3 client
   become: yes
   docker_container:
     capabilities: SYS_ADMIN
@@ -25,13 +25,13 @@
       - /lib/x86_64-linux-gnu/libcrypto.so.1.0.0:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0:ro
   delegate_to: "{{ hostvars[groups['client'][0]]['inventory_hostname'] }}"
   register: perf_output
-- name: (index {{ index }}, size {{ bytes }}) save output
+- name: (index {{ index }}/{{ repetition }}, size {{ bytes }}) save output
   copy:
     backup: yes
     content: "{{ perf_output.ansible_facts.docker_container.Output }}"
     dest: "{{ workdir }}/logs/perf_iPerf3_{{ bytes }}_{{ index }}.log"
     force: yes
-- name: (index {{ index }}, size {{ bytes }}) extract data
+- name: (index {{ index }}/{{ repetition }}, size {{ bytes }}) extract data
   command: >
     scripts/extract2csv.sh
     {{ workdir }}/logs/perf_iPerf3_{{ bytes }}_{{ index }}.log
