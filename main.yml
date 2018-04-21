@@ -63,7 +63,7 @@
       # if we upgraded the version of iPerf3
       shell: realpath {{ workdir }}/iperf-3.*
       register: iperf3_abs_dir
-    - name: generate the {{ iperf3_abs_dir.stdout }}/src/.libs/lt-iperf3
+    - name: generate {{ iperf3_abs_dir.stdout }}/src/.libs/lt-iperf3
       # This step can't be postponed until the execution inside the container
       # because the execution program is generated during the installation
       # and some configuration pathes does not match within the container.
@@ -76,8 +76,7 @@
 - name: run tests
   hosts: client
   tasks:
-    - name: perf stat the iPerf3 client
-      include_tasks: include/perf_iperf3_client.yml
+    - include_tasks: include/perf_iperf3_client.yml
       loop: "{{ transmission_size }}"
       loop_control:
         loop_var: bytes

@@ -1,44 +1,12 @@
 ---
-- name: "test of transmission size: {{ bytes }}"
-  become: yes
-  docker_container:
-    capabilities: SYS_ADMIN
-    cleanup: yes
-    command: >
-      stat /root/iperf3/src/iperf3
-      --client {{ hostvars[groups['server'][0]]['ansible_' + server_outbound_interface]['ipv4']['address'] }}
-      --bind {{ hostvars[groups['client'][0]]['ansible_' + client_incoming_interface]['ipv4']['address'] }}
-      --reverse --json --affinity 4 --verbose --length 128k --parallel 1 --bytes {{ bytes }}
-    detach: false
-    env:
-      LD_LIBRARY_PATH: /root/iperf3/src/.libs
-    force_kill: yes
-    image: ljishen/perf
-    name: perf
-    network_mode: host
-    pull: yes
-    recreate: yes
-    state: started
-    volumes:
-      - "{{ iperf3_abs_dir.stdout }}:/root/iperf3:ro"
-      - /usr/lib/x86_64-linux-gnu/libsctp.so.1:/usr/lib/x86_64-linux-gnu/libsctp.so.1:ro
-      - /lib/x86_64-linux-gnu/libcrypto.so.1.0.0:/lib/x86_64-linux-gnu/libcrypto.so.1.0.0:ro
-  register: perf_output
-- name: ensure presence of dir logs
+- name: ensure the presence of dir logs
   local_action:
     module: file
     path: "{{ workdir }}/logs"
     state: directory
   run_once: true
-- name: "save output for transmission size: {{ bytes }}"
-  local_action:
-    module: copy
-    backup: yes
-    content: "{{ perf_output.ansible_facts.docker_container.Output }}"
-    dest: "{{ workdir }}/logs/perf_iPerf3_{{ bytes }}.log"
-    force: yes
-- name: drop file cache
-  become: yes
-  # See https://www.kernel.org/doc/Documentation/sysctl/vm.txt
-  shell: sync && echo 3 > /proc/sys/vm/drop_caches
-  delegate_to: "{{ hostvars[groups['server'][0]]['inventory_hostname'] }}"
+- name: start tests for transmission size {{ bytes }}
+  include_tasks: include/single_test.yml
+  with_sequence: count={{ repetition }}
+  loop_control:
+    loop_var: index
