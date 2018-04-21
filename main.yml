@@ -23,7 +23,6 @@
     - name: start the iPerf3 server
       become: yes
       docker_container:
-        cleanup: yes
         command: >
           /root/results/server_iperf3.log
           --server
@@ -32,7 +31,7 @@
         detach: yes
         force_kill: yes
         image: ljishen/iperf3
-        name: iperf3
+        name: "{{ iperf3_container_name }}"
         network_mode: host
         pull: yes
         recreate: yes
@@ -93,3 +92,12 @@
       loop: "{{ transmission_size }}"
       loop_control:
         loop_var: bytes
+
+- name: remove the iPerf3 server
+  hosts: server
+  become: yes
+  tasks:
+    - docker_container:
+        force_kill: yes
+        name: "{{ iperf3_container_name }}"
+        state: absent
