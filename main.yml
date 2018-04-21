@@ -73,17 +73,15 @@
       command: "{{ iperf3_abs_dir.stdout }}/src/iperf3 --version"
 
 - name: run tests
-  hosts: client
+  hosts: localhost
   tasks:
     - name: ensure the presence of log dir
-      local_action:
-        module: file
+      file:
         path: "{{ workdir }}/logs"
         state: directory
     - name: create the result file
-      local_action:
-        # Use the copy module to backup the old file if necessary
-        module: copy
+      # Use the copy module to backup the old file if necessary
+      copy:
         backup: yes
         content: ""
         dest: "{{ workdir }}/{{ result_file_prefix }}.csv"
