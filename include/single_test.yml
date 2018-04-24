@@ -29,13 +29,13 @@
   copy:
     backup: yes
     content: "{{ perf_output.ansible_facts.docker_container.Output }}"
-    dest: "{{ workdir }}/logs/perf_iPerf3_{{ bytes }}_{{ index }}.log"
+    dest: "{{ output_dir }}/logs/perf_iPerf3_{{ bytes }}_{{ index }}.log"
     force: yes
 - name: (index {{ index }}/{{ repetition }}, size {{ bytes }}) extract data
   command: >
     scripts/extract2csv.sh
-    {{ workdir }}/logs/perf_iPerf3_{{ bytes }}_{{ index }}.log
-    {{ workdir }}/{{ result_file_prefix }}.csv
+    {{ output_dir }}/logs/perf_iPerf3_{{ bytes }}_{{ index }}.log
+    {{ output_dir }}/{{ result_file_prefix }}.csv
     {{ bytes if index == '1' else '' }}
 - name: drop file cache
   become: yes
