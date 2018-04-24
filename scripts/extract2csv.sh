@@ -15,8 +15,8 @@ DEST="$2"
 CATEGORY="${3:-}"
 
 if [ ! -z "$CATEGORY" ]; then
-    echo "$CATEGORY,cycles," >> "$DEST"
-    echo ",bitrate," >> "$DEST"
+    echo "$CATEGORY,Cycles," >> "$DEST"
+    echo "$CATEGORY,Bitrate," >> "$DEST"
 fi
 
 # Extract cpu cycles
