@@ -1,0 +1,40 @@
+---
+- import_playbook: ../prerequisites.yml
+
+- name: install Fio to receiver
+  hosts: receiver
+  tasks:
+    - name: delete obsolate installation dir
+      shell: rm -rf {{ workdir }}/fio-fio-*
+      args:
+        warn: no
+    - name: download fio-{{ fio_version }}
+      unarchive:
+        dest: "{{ workdir }}"
+        remote_src: yes
+        src: https://codeload.github.com/axboe/fio/tar.gz/fio-{{ fio_version }}
+    - name: configure and make fio-{{ fio_version }}
+      shell: ./configure && make -j "$(nproc)"
+      args:
+        chdir: "{{ workdir }}/fio-fio-{{ fio_version }}"
+
+- name: deploy the jobfile for sender
+  hosts: sender
+  tasks:
+    - template:
+        dest: "{{ workdir }}/netio_sender.fio"
+        force: yes
+        src: templates/netio_sender.j2
+
+- name: deploy the jobfile for receiver
+  hosts: receiver
+  tasks:
+    - template:
+        dest: "{{ workdir }}/netio_receiver.fio"
+        force: yes
+        src: templates/netio_receiver.j2
+
+#- name: run tests
+#  hosts: localhost
+#  tasks:
+#    - name:
