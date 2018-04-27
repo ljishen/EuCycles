@@ -4,6 +4,16 @@
 - name: install Fio to receiver
   hosts: receiver
   tasks:
+    - name: install the libaio development package
+      # Missing this package will cause the following error message:
+      # error while loading shared libraries:
+      #   libaio.so.1: cannot open shared object file: No such file or director
+      apt:
+        install_recommends: no
+        # This package has the same name in Ubuntu and Debian
+        name: libaio1
+        state: latest
+        update_cache: yes
     - name: delete obsolate installation dir
       shell: rm -rf {{ workdir }}/fio-fio-*
       args:
@@ -22,7 +32,7 @@
   hosts: sender
   tasks:
     - template:
-        dest: "{{ workdir }}/netio_sender.fio"
+        dest: "{{ workdir }}/sender.fio"
         force: yes
         src: templates/netio_sender.j2
 
@@ -30,11 +40,27 @@
   hosts: receiver
   tasks:
     - template:
-        dest: "{{ workdir }}/netio_receiver.fio"
+        dest: "{{ workdir }}/receiver.fio"
         force: yes
         src: templates/netio_receiver.j2
 
-#- name: run tests
-#  hosts: localhost
-#  tasks:
-#    - name:
+- name: run tests
+  hosts: localhost
+  vars:
+    output_dir: "{{ playbook_dir }}/output"
+  tasks:
+    - name: ensure the presence of log dir
+      file:
+        path: "{{ output_dir }}/logs"
+        state: directory
+    - name: create the result file
+      # Use the copy module to backup the old file if necessary
+      copy:
+        backup: yes
+        content: ""
+        dest: "{{ output_dir }}/{{ result_file_prefix }}.csv"
+        force: yes
+    - include_tasks: include/perf_fio_receiver.yml
+      loop: "{{ transmission_size }}"
+      loop_control:
+        loop_var: bytes

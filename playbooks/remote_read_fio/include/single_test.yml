@@ -1,0 +1,42 @@
+---
+- name: (index {{ index }}/{{ repetition }}, size {{ bytes }}) run the sender
+  docker_conainer:
+    cleanup: yes
+    command: >
+      --size={{ bytes }} /root/sender.fio
+    detach: false
+    force_kill: yes
+    image: ljishen/fio
+    name: "{{ fio_container_name }}"
+    network_mode: host
+    pull: yes
+    recreate: yes
+    state: started
+    volumes:
+      - "{{ workdir }}/sender.fio":/root/sender.fio
+  delegate_to: "{{ hostvars[groups['sender'][0]]['inventory_hostname'] }}"
+- name: (index {{ index }}/{{ repetition }}, size {{ bytes }}) run the receiver
+  docker_container:
+    capabilities: SYS_ADMIN
+    cleanup: yes
+    command: stat /root/fio/fio --size={{ bytes }} /root/receiver.fio
+    detach: false
+    force_kill: yes
+    image: ljishen/perf
+    name: "{{ perf_container_name }}"
+    network_mode: host
+    pull: yes
+    recreate: yes
+    state: started
+    volumes:
+      - "{{ workdir }}/fio-fio-{{ fio_version }}:/root/fio:ro"
+      - /lib/x86_64-linux-gnu/libaio.so.1:/lib/x86_64-linux-gnu/libaio.so.1:ro
+      - "{{ workdir }}/receiver.fio:/root/receiver:ro"
+  delegate_to: "{{ hostvars[groups['receiver'][0]]['inventory_hostname'] }}"
+  register: perf_out
+- name: (index {{ index }}/{{ repetition }}, size {{ bytes }}) save output
+  copy:
+    backup: yes
+    content: "{{ perf_output.ansible_facts.docker_container.Output }}"
+    dest: "{{ output_dir }}/logs/perf_fio_{{ bytes }}_{{ index }}.log"
+    force: yes
