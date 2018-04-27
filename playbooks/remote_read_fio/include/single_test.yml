@@ -1,10 +1,11 @@
 ---
 - name: (index {{ index }}/{{ repetition }}, size {{ bytes }}) run the sender
-  docker_conainer:
-    cleanup: yes
+  become: yes
+  docker_container:
+    auto_remove: yes
     command: >
       --size={{ bytes }} /root/sender.fio
-    detach: false
+    detach: yes
     force_kill: yes
     image: ljishen/fio
     name: "{{ fio_container_name }}"
@@ -13,9 +14,10 @@
     recreate: yes
     state: started
     volumes:
-      - "{{ workdir }}/sender.fio":/root/sender.fio
+      - "{{ workdir }}/sender.fio:/root/sender.fio:ro"
   delegate_to: "{{ hostvars[groups['sender'][0]]['inventory_hostname'] }}"
 - name: (index {{ index }}/{{ repetition }}, size {{ bytes }}) run the receiver
+  become: yes
   docker_container:
     capabilities: SYS_ADMIN
     cleanup: yes
@@ -29,11 +31,11 @@
     recreate: yes
     state: started
     volumes:
-      - "{{ workdir }}/fio-fio-{{ fio_version }}:/root/fio:ro"
+      - "{{ workdir }}/{{ fio_dir_prefix }}{{ receiver_fio_version }}:/root/fio:ro"
       - /lib/x86_64-linux-gnu/libaio.so.1:/lib/x86_64-linux-gnu/libaio.so.1:ro
-      - "{{ workdir }}/receiver.fio:/root/receiver:ro"
+      - "{{ workdir }}/receiver.fio:/root/receiver.fio:ro"
   delegate_to: "{{ hostvars[groups['receiver'][0]]['inventory_hostname'] }}"
-  register: perf_out
+  register: perf_output
 - name: (index {{ index }}/{{ repetition }}, size {{ bytes }}) save output
   copy:
     backup: yes

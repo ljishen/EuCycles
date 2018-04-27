@@ -1,13 +1,15 @@
 ---
 - import_playbook: ../prerequisites.yml
 
-- name: install Fio to receiver
+- name: install fio to receiver
   hosts: receiver
+  any_errors_fatal: true
   tasks:
     - name: install the libaio development package
       # Missing this package will cause the following error message:
       # error while loading shared libraries:
       #   libaio.so.1: cannot open shared object file: No such file or director
+      become: yes
       apt:
         install_recommends: no
         # This package has the same name in Ubuntu and Debian
@@ -15,18 +17,18 @@
         state: latest
         update_cache: yes
     - name: delete obsolate installation dir
-      shell: rm -rf {{ workdir }}/fio-fio-*
+      shell: rm -rf {{ workdir }}/{{ fio_dir_prefix }}*
       args:
         warn: no
-    - name: download fio-{{ fio_version }}
+    - name: download fio-{{ receiver_fio_version }}
       unarchive:
         dest: "{{ workdir }}"
         remote_src: yes
-        src: https://codeload.github.com/axboe/fio/tar.gz/fio-{{ fio_version }}
-    - name: configure and make fio-{{ fio_version }}
+        src: https://codeload.github.com/axboe/fio/tar.gz/fio-{{ receiver_fio_version }}
+    - name: configure and make fio-{{ receiver_fio_version }}
       shell: ./configure && make -j "$(nproc)"
       args:
-        chdir: "{{ workdir }}/fio-fio-{{ fio_version }}"
+        chdir: "{{ workdir }}/{{ fio_dir_prefix }}{{ receiver_fio_version }}"
 
 - name: deploy the jobfile for sender
   hosts: sender
