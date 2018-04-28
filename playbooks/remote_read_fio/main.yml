@@ -1,5 +1,5 @@
 ---
-- import_playbook: ../prerequisites.yml
+- import_playbook: ../common/prerequisites.yml
 
 - name: install fio to receiver
   hosts: receiver
@@ -46,23 +46,9 @@
         force: yes
         src: templates/netio_receiver.j2
 
-- name: run tests
+- name: run bench
   hosts: localhost
   vars:
     output_dir: "{{ playbook_dir }}/output"
   tasks:
-    - name: ensure the presence of log dir
-      file:
-        path: "{{ output_dir }}/logs"
-        state: directory
-    - name: create the result file
-      # Use the copy module to backup the old file if necessary
-      copy:
-        backup: yes
-        content: ""
-        dest: "{{ output_dir }}/{{ result_file_prefix }}.csv"
-        force: yes
-    - include_tasks: include/perf_fio_receiver.yml
-      loop: "{{ transmission_size }}"
-      loop_control:
-        loop_var: bytes
+    - include_tasks: ../common/tasks/run_bench.yml

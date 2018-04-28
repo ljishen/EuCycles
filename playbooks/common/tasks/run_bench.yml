@@ -1,0 +1,16 @@
+---
+- name: ensure the presence of log dir
+  file:
+    path: "{{ output_dir }}/logs"
+    state: directory
+- name: create the result file
+  # Use the copy module to backup the old file if necessary
+  copy:
+    backup: yes
+    content: ""
+    dest: "{{ output_dir }}/{{ result_file_prefix }}.csv"
+    force: yes
+- include_tasks: repetition.yml
+  loop: "{{ transmission_size }}"
+  loop_control:
+    loop_var: bytes

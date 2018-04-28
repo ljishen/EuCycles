@@ -1,5 +1,5 @@
 ---
-- import_playbook: ../prerequisites.yml
+- import_playbook: ../common/prerequisites.yml
 
 - name: deploy iPerf3 server
   hosts: server
@@ -65,26 +65,12 @@
       # See the script: {{ iperf3_abs_dir.stdout }}/src/iperf3
       command: "{{ iperf3_abs_dir.stdout }}/src/iperf3 --version"
 
-- name: run tests
+- name: run bench
   hosts: localhost
   vars:
     output_dir: "{{ playbook_dir }}/output"
   tasks:
-    - name: ensure the presence of log dir
-      file:
-        path: "{{ output_dir }}/logs"
-        state: directory
-    - name: create the result file
-      # Use the copy module to backup the old file if necessary
-      copy:
-        backup: yes
-        content: ""
-        dest: "{{ output_dir }}/{{ result_file_prefix }}.csv"
-        force: yes
-    - include_tasks: include/perf_iperf3_client.yml
-      loop: "{{ transmission_size }}"
-      loop_control:
-        loop_var: bytes
+    - include_tasks: ../common/tasks/run_bench.yml
 
 - name: remove the iPerf3 server
   hosts: server
