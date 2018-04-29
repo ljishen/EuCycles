@@ -20,10 +20,16 @@ if [ ! -z "$CATEGORY" ]; then
 fi
 
 # Extract cpu cycles
-cycles=$(grep -oP '\d+(?=\s+cycles)' "$SOURCE")
+if ! cycles=$(grep -oP '\d+(?=\s+cycles)' "$SOURCE"); then
+    echo "Error: no value for \"cycles\" in the source file."
+    exit 1
+fi
 
 # Extract the aggregate bandwidth "bit/s" for receiver
-bitrate=$(grep -oP 'bw=\K[\d.]+' "$SOURCE")
+if ! bitrate=$(grep -oP 'bw=\K[\d.]+' "$SOURCE"); then
+    echo "Error: no value (bitrate) for \"bw=\" in the source file."
+    exit 1
+fi
 
 num_lines=$(wc -l < "$DEST")
 
