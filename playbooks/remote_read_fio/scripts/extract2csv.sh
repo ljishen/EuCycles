@@ -14,11 +14,6 @@ SOURCE="$1"
 DEST="$2"
 CATEGORY="${3:-}"
 
-if [ ! -z "$CATEGORY" ]; then
-    echo "$CATEGORY,Cycles," >> "$DEST"
-    echo "$CATEGORY,Bitrate," >> "$DEST"
-fi
-
 # Extract cpu cycles
 if ! cycles=$(grep -oP '\d+(?=\s+cycles)' "$SOURCE"); then
     echo "Error: no value for \"cycles\" in the source file."
@@ -29,6 +24,11 @@ fi
 if ! bitrate=$(grep -oP 'bw=\K[\d.]+' "$SOURCE"); then
     echo "Error: no value (bitrate) for \"bw=\" in the source file."
     exit 1
+fi
+
+if [ ! -z "$CATEGORY" ]; then
+    echo "$CATEGORY,Cycles," >> "$DEST"
+    echo "$CATEGORY,Bitrate," >> "$DEST"
 fi
 
 num_lines=$(wc -l < "$DEST")
