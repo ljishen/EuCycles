@@ -38,7 +38,7 @@ def get_args():
         required=False)
     parser.add_argument(
         '-z', '--zerocopy', action='store_true',
-        help='Use "socket.sendfile()" instead of socket.send().',
+        help='Use "socket.sendfile()" instead of "socket.send()".',
         required=False)
 
     args = parser.parse_args()
