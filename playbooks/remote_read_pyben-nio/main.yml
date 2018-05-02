@@ -3,14 +3,14 @@
 
 - hosts: server
   vars:
-    data_file_path: "{{ workdir }}/{{ data_filename }}"
+    data_file_path: "{{ workdir }}/{{ server_data_filename }}"
   tasks:
     - name: delete obsolate data file
       file:
         path: "{{ data_file_path }}"
         state: absent
     - name: create data file for read by the server
-      command: fallocate -l {{ data_file_size }} {{ data_file_path }}
+      command: fallocate -l {{ server_data_file_size }} {{ data_file_path }}
 
 - name: install pyben-nio to client
   hosts: client
@@ -19,7 +19,7 @@
       git:
         clone: yes
         depth: 1
-        dest: "{{ workdir }}"
+        dest: "{{ workdir }}/dockerfiles"
         force: yes
         repo: https://github.com/ljishen/dockerfiles.git
         update: yes
