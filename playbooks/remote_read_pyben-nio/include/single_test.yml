@@ -5,7 +5,7 @@
     auto_remove: yes
     command: >
       --server
-      --bind {{ hostvars[inventory_hostname]['ansible_' + server_outbound_interface]['ipv4']['address'] }}
+      --bind {{ hostvars[groups['server'][0]]['ansible_' + server_outbound_interface]['ipv4']['address'] }}
       --size {{ bytes }}
       --port {{ port }}
       --filename /root/{{ server_data_filename }}
@@ -32,12 +32,13 @@
       stat
       /root/pyben-nio/scripts/run
       --client
-      --address {{ hostvars[inventory_hostname]['ansible_' + server_outbound_interface]['ipv4']['address'] }}
+      --address {{ hostvars[groups['server'][0]]['ansible_' + server_outbound_interface]['ipv4']['address'] }}
       --size {{ bytes }}
       --port {{ port }}
+      --bind {{ hostvars[groups['client'][0]]['ansible_' + client_incoming_interface]['ipv4']['address'] }}
       --bufsize {{ bufsize }}
     cpuset_cpus: "{{ perf_container_cpuset }}"
-    detach: false
+    detach: no
     force_kill: yes
     image: ljishen/perf:4.9-python3
     name: "{{ perf_container_name }}"
