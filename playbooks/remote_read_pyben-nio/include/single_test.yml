@@ -61,3 +61,8 @@
     {{ output_dir }}/logs/perf_pyben-nio_{{ bytes }}_{{ index }}.log
     {{ output_dir }}/{{ result_file_prefix }}.csv
     {{ bytes if index == '1' else '' }}
+- name: drop file cache
+  become: yes
+  # See https://www.kernel.org/doc/Documentation/sysctl/vm.txt
+  shell: sync && echo 3 > /proc/sys/vm/drop_caches
+  delegate_to: "{{ hostvars[groups['server'][0]]['inventory_hostname'] }}"
