@@ -1,0 +1,63 @@
+---
+- name: (index {{ index }}/{{ repetition }}, size {{ bytes }}) run the server
+  become: yes
+  docker_container:
+    auto_remove: yes
+    command: >
+      --server
+      --bind {{ hostvars[inventory_hostname]['ansible_' + server_outbound_interface]['ipv4']['address'] }}
+      --size {{ bytes }}
+      --port {{ port }}
+      --filename /root/{{ data_filename }}
+      --bufsize {{ bufsize }}
+      --zerocopy
+    cpuset_cpus: "{{ pyben-nio_container_cpuset }}"
+    detach: yes
+    force_kill: yes
+    image: ljishen/pyben-nio
+    name: "{{ pyben-nio_container_name }}"
+    network_mode: host
+    pull: yes
+    recreate: yes
+    state: started
+    volumes:
+      - "{{ workdir }}/{{ data_filename }}:/root/{{ data_filename }}:ro"
+  delegate_to: "{{ hostvars[groups['server'][0]]['inventory_hostname'] }}"
+- name: (index {{ index }}/{{ repetition }}, size {{ bytes }}) run the client
+  become: yes
+  docker_container:
+    capabilities: SYS_ADMIN
+    cleanup: yes
+    command: >
+      stat
+      /root/pyben-nio/scripts/run
+      --client
+      --address {{ hostvars[inventory_hostname]['ansible_' + server_outbound_interface]['ipv4']['address'] }}
+      --size {{ bytes }}
+      --port {{ port }}
+      --bufsize {{ bufsize }}
+    cpuset_cpus: "{{ perf_container_cpuset }}"
+    detach: false
+    force_kill: yes
+    image: ljishen/perf:4.9-python3
+    name: "{{ perf_container_name }}"
+    network_mode: host
+    pull: yes
+    recreate: yes
+    state: started
+    volumes:
+      - "{{ workdir }}/dockerfiles/pyben-nio:/root/pyben-nio:ro"
+  delegate_to: "{{ hostvars[groups['client'][0]]['inventory_hostname'] }}"
+  register: perf_output
+- name: (index {{ index }}/{{ repetition }}, size {{ bytes }}) save output
+  copy:
+    backup: yes
+    content: "{{ perf_output.ansible_facts.docker_container.Output }}"
+    dest: "{{ output_dir }}/logs/perf_pyben-nio_{{ bytes }}_{{ index }}.log"
+    force: yes
+- name: (index {{ index }}/{{ repetition }}, size {{ bytes }}) extract data
+  command: >
+    scripts/extract2csv.sh
+    {{ output_dir }}/logs/perf_pyben-nio_{{ bytes }}_{{ index }}.log
+    {{ output_dir }}/{{ result_file_prefix }}.csv
+    {{ bytes if index == '1' else '' }}

@@ -1,0 +1,33 @@
+---
+- import_playbook: ../common/prerequisites.yml
+
+- hosts: server
+  vars:
+    data_file_path: "{{ workdir }}/{{ data_filename }}"
+  tasks:
+    - name: delete obsolate data file
+      file:
+        path: "{{ data_file_path }}"
+        state: absent
+    - name: create data file for read by the server
+      command: fallocate -l {{ data_file_size }} {{ data_file_path }}
+
+- name: install pyben-nio to client
+  hosts: client
+  tasks:
+    - name: git the pyben-nio repo
+      git:
+        clone: yes
+        depth: 1
+        dest: "{{ workdir }}"
+        force: yes
+        repo: https://github.com/ljishen/dockerfiles.git
+        update: yes
+        version: HEAD
+
+- name: run bench
+  hosts: localhost
+  vars:
+    output_dir: "{{ playbook_dir }}/output"
+  tasks:
+    - include_tasks: ../common/tasks/run_bench.yml
