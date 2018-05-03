@@ -1,0 +1,20 @@
+---
+- name: install docker
+  become: yes
+  include_role:
+    name: angstwad.docker_ubuntu
+    private: yes
+  tags:
+    - install_docker
+- name: ensure the presence of workdir {{ workdir }}
+  become: no
+  file:
+    path: "{{ workdir }}"
+    state: directory
+- name: load common variables
+  # This is a temporary fix for the variables defined in
+  # a role are not exposed to the rest of playbook.
+  # This bug still exists in ansible-playbook 2.5.2
+  # https://github.com/ansible/ansible/issues/21890
+  include_vars:
+    file: main.yml
