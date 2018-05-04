@@ -21,8 +21,8 @@ if ! cycles=$(grep -oP '\d+(?=\s+cycles)' "$SOURCE"); then
 fi
 
 # Extract the average bandwidth "bit/s" on the client side
-if ! bitrate=$(grep -oP 'bitrate=\K[\d.]+' "$SOURCE"); then
-    echo "Error: no value (bitrate) for \"bitrate=\" in the source file."
+if ! bitrate=$(grep -oP 'SUMMARY.+bitrate: \K[\d.]+' "$SOURCE"); then
+    echo "Error: no value (bitrate) for \"[SUMMARY] ... bitrate: \" in the source file."
     exit 1
 fi
 
