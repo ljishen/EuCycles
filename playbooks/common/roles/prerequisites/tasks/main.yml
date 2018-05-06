@@ -16,5 +16,11 @@
   # a role are not exposed to the rest of playbook.
   # This bug still exists in ansible-playbook 2.5.2
   # https://github.com/ansible/ansible/issues/21890
+  #
+  # Note that we still need to load the common variables
+  # to the localhost even after this bug get fixed.
   include_vars:
     file: main.yml
+  delegate_to: "{{ item }}"
+  delegate_facts: true
+  loop: "{{ groups['all'] }} + ['localhost']"

@@ -1,0 +1,76 @@
+---
+- name: (servers {{ num_servs }}/{{ total_servs }}, round {{ index }}/{{ repetition }}, size {{ bytes }}) run the server
+  become: yes
+  docker_container:
+    auto_remove: yes
+    command: >
+      --server
+      --bind {{ hostvars[groups['servers'][serv_idx | int]]['ansible_' + server_outbound_interface]['ipv4']['address'] }}
+      --size {{ lookup('template', 'templates/allocator.j2').split(',')[serv_idx | int] }}
+      --port {{ port }}
+      --filename /root/{{ server_data_filename }}
+      --bufsize {{ bufsize }}
+      --zerocopy
+    cpuset_cpus: "{{ pybennio_container_cpuset }}"
+    detach: yes
+    force_kill: yes
+    image: ljishen/pyben-nio
+    name: "{{ pybennio_container_name }}"
+    network_mode: host
+    pull: yes
+    recreate: yes
+    state: started
+    volumes:
+      - "{{ workdir }}/{{ server_data_filename }}:/root/{{ server_data_filename }}:ro"
+  delegate_to: "{{ hostvars[groups['servers'][serv_idx | int]]['inventory_hostname'] }}"
+  with_sequence: start=0 count={{ num_servs }}
+  loop_control:
+    loop_var: serv_idx
+- name: (servers {{ num_servs }}/{{ total_servs }}, round {{ index }}/{{ repetition }}, size {{ bytes }}) run the client
+  become: yes
+  docker_container:
+    capabilities: SYS_ADMIN
+    cleanup: yes
+    command: >
+      stat
+      /root/pyben-nio/scripts/run
+      --client
+      --addresses
+        {%- for i in range(num_servs | int) %} {{ hostvars[groups['servers'][i]]['ansible_' + server_outbound_interface]['ipv4']['address'] }} {% endfor -%}
+      --size {{ bytes }}
+      --port {{ port }}
+      --bind {{ hostvars[groups['client'][0]]['ansible_' + client_incoming_interface]['ipv4']['address'] }}
+      --bufsize {{ bufsize }}
+    cpuset_cpus: "{{ perf_container_cpuset }}"
+    detach: no
+    force_kill: yes
+    image: ljishen/perf:4.9-python3
+    name: "{{ perf_container_name }}"
+    network_mode: host
+    pull: yes
+    recreate: yes
+    state: started
+    volumes:
+      - "{{ workdir }}/dockerfiles/pyben-nio:/root/pyben-nio:ro"
+  delegate_to: "{{ hostvars[groups['client'][0]]['inventory_hostname'] }}"
+  register: perf_output
+- name: (servers {{ num_servs }}/{{ total_servs }}, round {{ index }}/{{ repetition }}, size {{ bytes }}) save output
+  copy:
+    backup: yes
+    content: "{{ perf_output.ansible_facts.docker_container.Output }}"
+    dest: "{{ output_dir }}/logs/perf_pyben-nio_{{ bytes }}_{{ index }}_{{ num_servs }}servs.log"
+    force: yes
+- name: (servers {{ num_servs }}/{{ total_servs }}, round {{ index }}/{{ repetition }}, size {{ bytes }}) extract data
+  command: >
+    scripts/extract2csv.sh
+    {{ output_dir }}/logs/perf_pyben-nio_{{ bytes }}_{{ index }}_{{ num_servs }}servs.log
+    {{ output_dir }}/{{ result_file_prefix }}.csv
+    {{ bytes if index == '1' else '' }}
+- name: drop file cache
+  become: yes
+  # See https://www.kernel.org/doc/Documentation/sysctl/vm.txt
+  shell: sync && echo 3 > /proc/sys/vm/drop_caches
+  delegate_to: "{{ hostvars[groups['servers'][serv_idx | int]]['inventory_hostname'] }}"
+  with_sequence: start=0 count={{ num_servs }}
+  loop_control:
+    loop_var: serv_idx

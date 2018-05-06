@@ -1,0 +1,13 @@
+{% from 'converter.j2' import size2b -%}
+
+['{{ blocksize }}'
+{%- call(blk_sz_b) size2b(blocksize) -%}
+    {% for size in transmission_sizes -%}
+        {% call(sz_b) size2b(size) -%}
+            {% if sz_b > blk_sz_b -%}
+                , '{{ size }}'
+            {%- endif -%}
+        {% endcall -%}
+    {% endfor -%}
+{% endcall -%}
+]

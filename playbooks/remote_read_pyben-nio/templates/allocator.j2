@@ -1,0 +1,16 @@
+{% from 'converter.j2' import size2b -%}
+
+{% call(sz_b) size2b(bytes) -%}
+    {% set num = num_servs | int -%}
+    {% set floor = sz_b // num -%}
+    {% set left = sz_b - floor * num -%}
+    {% for i in range(num) -%}
+        {% if i < left -%}
+            {{ floor + 1 }}
+        {%- else -%}
+            {{ floor }}
+        {%- endif -%}
+
+        {% if i < num - 1 -%} , {%- endif -%}
+    {% endfor -%}
+{% endcall -%}

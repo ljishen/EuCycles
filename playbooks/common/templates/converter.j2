@@ -1,0 +1,11 @@
+{% macro size2b(size) -%}
+    {% set sz_b = size | regex_replace('[^0-9]') | int -%}
+    {% if size | regex_search('[kK]') -%}
+        {% set sz_b = sz_b * (2 ** 10) -%}
+    {% elif size | regex_search('[mM]') -%}
+        {% set sz_b = sz_b * (2 ** 20) -%}
+    {% elif size | regex_search('[gG]') -%}
+        {% set sz_b = sz_b * (2 ** 30) -%}
+    {% endif -%}
+    {{ caller(sz_b) }}
+{%- endmacro -%}
