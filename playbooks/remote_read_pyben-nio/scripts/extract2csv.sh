@@ -2,17 +2,19 @@
 
 set -eu
 
-if [ "$#" -lt 2 ] || [[ "$1" == -* ]]; then
+if [ "$#" -lt 3 ] || [[ "$1" == -* ]]; then
     cat <<-ENDOFMESSAGE
-Usage: ./extract.sh SOURCE DEST CATEGORY
-Extract information from SOURCE file and append to the DEST file.
+Usage: ./extract2csv.sh SOURCE DEST CATEGORY
+Extract information from SOURCE file and append it to the DEST file based on the CATEGORY.
+
+Format of CATEGORY: bytes,num_servs, e.g. 1K,1 2G,2
 ENDOFMESSAGE
     exit
 fi
 
 SOURCE="$1"
 DEST="$2"
-CATEGORY="${3:-}"
+CATEGORY="$3"
 
 # Extract cpu cycles
 if ! cycles=$(grep -oP '\d+(?=\s+cycles)' "$SOURCE"); then
@@ -26,15 +28,16 @@ if ! bitrate=$(grep -oP 'SUMMARY.+bitrate: \K[\d.]+' "$SOURCE"); then
     exit 1
 fi
 
-if [ ! -z "$CATEGORY" ]; then
+category_line_num=$(grep -n "$CATEGORY" "$DEST" | head -n 1 | cut -d ':' -f 1)
+
+if [ -z "$category_line_num" ]; then
     echo "$CATEGORY,Cycles," >> "$DEST"
     echo "$CATEGORY,Bitrate," >> "$DEST"
+    category_line_num=$(grep -n "$CATEGORY" "$DEST" | head -n 1 | cut -d ':' -f 1)
 fi
 
-num_lines=$(wc -l < "$DEST")
-
-line_of_cycles=$(( num_lines - 1 ))
+line_of_cycles=$(( category_line_num ))
 sed -i "$line_of_cycles s/$/${cycles},/" "$DEST"
 
-line_of_bitrate=$(( num_lines ))
+line_of_bitrate=$(( category_line_num + 1 ))
 sed -i "$line_of_bitrate s/$/${bitrate},/" "$DEST"

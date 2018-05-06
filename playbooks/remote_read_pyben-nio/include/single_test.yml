@@ -26,6 +26,9 @@
   with_sequence: start=0 count={{ num_servs }}
   loop_control:
     loop_var: serv_idx
+- name: wait for 2 seconds to ensure {{ num_servs }} servers have set up
+  pause:
+    seconds: 2
 - name: (servers {{ num_servs }}/{{ total_servs }}, round {{ index }}/{{ repetition }}, size {{ bytes }}) run the client
   become: yes
   docker_container:
@@ -65,7 +68,7 @@
     scripts/extract2csv.sh
     {{ output_dir }}/logs/perf_pyben-nio_{{ bytes }}_{{ index }}_{{ num_servs }}servs.log
     {{ output_dir }}/{{ result_file_prefix }}.csv
-    {{ bytes if index == '1' else '' }}
+    {{ bytes }},{{ num_servs }}
 - name: drop file cache
   become: yes
   # See https://www.kernel.org/doc/Documentation/sysctl/vm.txt

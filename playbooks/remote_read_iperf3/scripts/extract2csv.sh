@@ -4,7 +4,7 @@ set -eu
 
 if [ "$#" -lt 2 ] || [[ "$1" == -* ]]; then
     cat <<-ENDOFMESSAGE
-Usage: ./extract.sh SOURCE DEST CATEGORY
+Usage: ./extract2csv.sh SOURCE DEST CATEGORY
 Extract information from SOURCE file and append to the DEST file.
 ENDOFMESSAGE
     exit
