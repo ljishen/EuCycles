@@ -42,7 +42,8 @@
       --port {{ port }}
       --bind {{ hostvars[groups['client'][0]]['ansible_' + client_incoming_interface]['ipv4']['address'] }}
       --bufsize {{ bufsize }}
-    cpuset_cpus: "{{ perf_container_cpuset }}"
+    cpuset_cpus:
+      "{{ perf_container_cpuset_start }}-{{ perf_container_cpuset_end if perf_container_cpuset_end is number else perf_container_cpuset_start + num_servs | int - 1 }}"
     detach: no
     force_kill: yes
     image: ljishen/perf:4.9-python3
