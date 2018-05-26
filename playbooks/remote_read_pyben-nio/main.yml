@@ -1,33 +1,47 @@
 ---
-- name: ensure all prerequisites
+- name: ensure common prerequisites
   hosts: all
   roles:
     - { role: ../common/roles/prerequisites, become: yes }
+  tasks:
+    - name: install Pyben-nio
+      git:
+        clone: yes
+        depth: 1
+        dest: "{{ workdir }}/pyben-nio"
+        force: yes
+        recursive: no
+        repo: https://github.com/ljishen/pyben-nio.git
+        update: yes
+        version: HEAD
+      async: 30
+      poll: 0
+    - name: pull or update image {{ perf_image_name }}
+      become: yes
+      docker_image:
+        force: yes
+        name: "{{ perf_image_name }}"
+        state: present
+      async: "{{ 2 * 60 }}"
+      poll: 2
 
 - hosts: servers
   any_errors_fatal: true
   vars:
     data_file_path: "{{ workdir }}/{{ server_data_filename }}"
   tasks:
+    - name: stop running server
+      become: yes
+      docker_container:
+        force_kill: yes
+        name: "{{ perf_server_container_name }}"
+        state: absent
     - name: delete obsolate data file
       file:
         path: "{{ data_file_path }}"
         state: absent
     - name: create data file for read by the server
       command: fallocate -l {{ server_data_file_size }} {{ data_file_path }}
-
-- name: install pyben-nio to client
-  hosts: client
-  tasks:
-    - name: git the pyben-nio repo
-      git:
-        clone: yes
-        depth: 1
-        dest: "{{ workdir }}/dockerfiles"
-        force: yes
-        repo: https://github.com/ljishen/dockerfiles.git
-        update: yes
-        version: HEAD
 
 - name: run bench
   hosts: localhost
