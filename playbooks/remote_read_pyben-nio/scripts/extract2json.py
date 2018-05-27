@@ -72,8 +72,10 @@ def __add_client_data(logs_dir, data, size, index, num_servs):
 
     cycles, bitrate = __extract_from_file(client_log_file)
 
-    __set_arr_prop(data, size, str(num_servs), "cycles", "client", value=cycles)
-    __set_arr_prop(data, size, str(num_servs), "bitrate", "client", value=bitrate)
+    __set_arr_prop(data, size, str(num_servs), "cycles", "client",
+                   value=cycles)
+    __set_arr_prop(data, size, str(num_servs), "bitrate", "client",
+                   value=bitrate)
 
 
 def __add_server_data(logs_dir, data, size, index, num_servs):
@@ -112,7 +114,7 @@ def __extract_from_file(file):
     matchobj = PATTERN_BITRATE.search(content)
     bitrate = matchobj.group(1)
 
-    return cycles, bitrate
+    return int(cycles), float(bitrate)
 
 
 def __set_arr_prop(data, *args, value=None):
