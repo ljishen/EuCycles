@@ -80,7 +80,7 @@
 
 - name: (servers {{ num_servs }}/{{ total_servs }}, round {{ index }}/{{ repetition }}, size {{ bytes }}) save server outputs
   copy:
-    backup: yes
+    backup: "{{ backup_results }}"
     content: "{{ output_item.ansible_facts.docker_container.Output }}"
     dest: "{{ output_dir }}/logs/perf_server_{{ bytes }}_{{ index }}_{{ num_servs }}servs_{{ output_item.result_item.serv_idx }}.log"
     force: yes
@@ -91,7 +91,7 @@
 
 - name: (servers {{ num_servs }}/{{ total_servs }}, round {{ index }}/{{ repetition }}, size {{ bytes }}) save client output
   copy:
-    backup: yes
+    backup: "{{ backup_results }}"
     content: "{{ perf_client_result.ansible_facts.docker_container.Output }}"
     dest: "{{ output_dir }}/logs/perf_client_{{ bytes }}_{{ index }}_{{ num_servs }}servs.log"
     force: yes
