@@ -103,6 +103,11 @@
     --index {{ index }}
     --num_servs {{ num_servs }}
     --result_filename {{ result_filename }}
+  register: extract_result
+  ignore_errors: yes
+
+- set_fact:
+    tasks_success: "{{ 'yes' if extract_result.rc == 0 else 'no' }}"
 
 - name: drop file cache
   become: yes
