@@ -108,8 +108,6 @@
     # this task may fail if the previous registers didn't capture the stdout of containers (ansible bugs?)
     ignore_errors: yes
 
-  - set_fact: exe_continue={{ extract_result.rc != 0 }}
-
   - name: drop file cache
     become: yes
     # See https://www.kernel.org/doc/Documentation/sysctl/vm.txt
@@ -118,5 +116,7 @@
     with_sequence: start=0 count={{ num_servs }}
     loop_control:
       loop_var: serv_idx
+
+  - set_fact: exe_continue={{ extract_result.rc != 0 }}
 
   when: exe_continue
