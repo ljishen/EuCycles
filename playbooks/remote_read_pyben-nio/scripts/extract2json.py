@@ -10,7 +10,7 @@ import re
 def __get_args():
     parser = argparse.ArgumentParser(
         description='Script for extracting numbers from the output of perfing \
-        the Pyben-nio server and client.')
+        the Pyben-nio servers and client.')
     parser.add_argument(
         '-s', '--size', type=str,
         help='Size of data I/O in the test',
@@ -59,7 +59,7 @@ def main():
     logs_dir = output_dir + '/logs'
 
     __add_client_data(logs_dir, data, size, index, num_servs)
-    __add_server_data(logs_dir, data, size, index, num_servs)
+    __add_servers_data(logs_dir, data, size, index, num_servs)
 
     with open(result_file, 'w') as json_fobj:
         json.dump(data, json_fobj, indent=4, sort_keys=True)
@@ -78,7 +78,7 @@ def __add_client_data(logs_dir, data, size, index, num_servs):
                    value=bitrate)
 
 
-def __add_server_data(logs_dir, data, size, index, num_servs):
+def __add_servers_data(logs_dir, data, size, index, num_servs):
     cycles_arr = []
     bitrates_arr = []
 
@@ -92,9 +92,9 @@ def __add_server_data(logs_dir, data, size, index, num_servs):
         cycles_arr.append(cycles)
         bitrates_arr.append(bitrate)
 
-    __set_arr_prop(data, size, str(num_servs), "cycles", "server",
+    __set_arr_prop(data, size, str(num_servs), "cycles", "servers",
                    value=cycles_arr)
-    __set_arr_prop(data, size, str(num_servs), "bitrate", "server",
+    __set_arr_prop(data, size, str(num_servs), "bitrate", "servers",
                    value=bitrates_arr)
 
 
