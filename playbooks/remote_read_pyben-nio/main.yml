@@ -40,8 +40,15 @@
       file:
         path: "{{ data_file_path }}"
         state: absent
-    - name: create data file for read by the server
-      command: fallocate -l {{ server_data_file_size }} {{ data_file_path }}
+      when: force_create_data_file
+    - name: create big data file for read by the server
+      command: >
+        "{{ workdir }}/pyben-nio/src/tools.py {{ server_data_file_size }}
+        --filename {{ workdir }}/{{ server_data_filename }}"
+      args:
+        creates: "{{ workdir }}/{{ server_data_filename }}"
+      async: "{{ 2 * 60 * 60 }}"
+      poll: 30
 
 - name: run bench
   hosts: localhost
