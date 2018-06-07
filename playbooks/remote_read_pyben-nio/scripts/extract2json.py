@@ -99,7 +99,7 @@ def __add_servers_data(logs_dir, data, size, index, num_servs):
 
 
 PATTERN_CYCLES = re.compile(r'(\d+)\s+cycles')
-PATTERN_BITRATE = re.compile(r'Total.+bitrate:\s+([\d.]+)')
+PATTERN_BITRATE = re.compile(r'SUMMARY.+Bitrate:\s+([\d.]+)')
 
 
 def __extract_from_file(file):
