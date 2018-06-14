@@ -2,7 +2,9 @@
 transmission_sizes: ['10%', '20%', '30%', '40%', '50%', '60%', '70%', '80%', '90%']
 repetition: 3
 
-dataset_size: '50G'
+# This value has nothing to do with the 'server_data_file_size'.
+# It could be bigger or smaller than the value of 'server_data_file_size'.
+dataset_size: '1G'
 
 # Don't change this option except you know what you are doing!
 backup_results: yes
@@ -16,9 +18,9 @@ client_incoming_interface: br_flat_lan_1
 # See the description page for more details
 # https://github.com/ljishen/pyben-nio
 port: 8881
-server_bufsize: 2000mb
+server_bufsize: 1024mb
 client_bufsize: 128kb
-server_filtering_method: "match; func=lambda v: v not in list(b'0123456789')[:LEN]; sztype=BEFORE"
+server_filtering_method: "match; func=lambda v: int(chr(v)) <= INDEX; sztype=BEFORE"
 client_filtering_method: "raw"
 
 # See the doc for option "--cpuset-cpus" on the container
