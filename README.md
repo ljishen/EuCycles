@@ -19,5 +19,5 @@ ansible-galaxy install -r requirements.yml
 
 # Run the playbook
 # Replace DIR with the specific playbook you want to run
-ansible-playbook -i playbooks/DIR/hosts playbooks/DIR/main.yml [--skip-tags install_docker]
+ansible-playbook -i playbooks/DIR/hosts playbooks/DIR/main.yml [--tags install_docker]
 ```
