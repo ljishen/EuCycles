@@ -59,19 +59,17 @@
 
 - name: reboot if servers boot parameters updated
   hosts: servers
-  any_errors_fatal: true
   become: yes
   tasks:
     - command: reboot
       when: boot_params_invalid
 
-# - name: reboot if client boot parameters updated
-#   hosts: client
-#   any_errors_fatal: true
-#   become: yes
-#   tasks:
-#     - command: reboot
-#       when: boot_params_invalid
+- name: reboot if client boot parameters updated
+  hosts: client
+  become: yes
+  tasks:
+    - command: reboot
+      when: boot_params_invalid
 
 - hosts: all
   tasks:
