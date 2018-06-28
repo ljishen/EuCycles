@@ -37,16 +37,25 @@
       register: cmd_nproc
       when: boot_params_invalid
     - debug: msg="The system has only {{ cmd_nproc.stdout }} (< 3) virtual processors"
-      when: cmd_nproc is defined and cmd_nproc.stdout | int < 3 and boot_params_invalid
+      when: boot_params_invalid and cmd_nproc.stdout is defined and cmd_nproc.stdout | int < 3
       failed_when: true
     - name: update kernel boot parameters
       become: yes
-      command: >
-        sed -i 's/\(GRUB_CMDLINE_LINUX_DEFAULT=\).*$/\1"nr_cpus=3 isolcpus=1,2"/' /etc/default/grub
-        && update-grub
+      lineinfile:
+        backrefs: yes
+        backup: yes
+        create: no
+        line: '\1nr_cpus=3 isolcpus=1,2 \2'
+        path: /etc/default/grub
+        regexp: '^(GRUB_CMDLINE_LINUX_DEFAULT=")(.*)$'
+        state: present
       when: boot_params_invalid
+    - name: update grub2 config file
+      become: yes
+      command: update-grub
       async: 10
       poll: 2
+      when: boot_params_invalid
 
 - name: reboot if servers boot parameters updated
   hosts: servers
@@ -56,17 +65,17 @@
     - command: reboot
       when: boot_params_invalid
 
-- name: reboot if client boot parameters updated
-  hosts: client
-  any_errors_fatal: true
-  become: yes
-  tasks:
-    - command: reboot
-      when: boot_params_invalid
+# - name: reboot if client boot parameters updated
+#   hosts: client
+#   any_errors_fatal: true
+#   become: yes
+#   tasks:
+#     - command: reboot
+#       when: boot_params_invalid
 
 - hosts: all
   tasks:
-    - debug: msg="Exit if reboot scheduled."
+    - debug: msg="Terminate if reboot scheduled."
       failed_when: boot_params_invalid
 
 - name: config CPUs for IRQ handling
@@ -79,6 +88,8 @@
         scripts/net_smp_affinity {{ net_dev_in_count }} {{ net_dev_in_count_cpu_mask }}
         &&
         scripts/net_smp_affinity {{ net_dev_out_of_count }} {{ net_dev_out_of_count_cpu_mask }}
+      register: cmd_net_smp_affinity
+    - debug: msg=net_smp_affinity.stdout
     - name: stop irqbalance service
       service:
         name: irqbalance

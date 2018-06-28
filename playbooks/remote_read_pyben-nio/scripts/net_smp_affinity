@@ -30,3 +30,5 @@ bitmask="$2"
 
 irqs=($(cat /proc/interrupts | grep "$dev_name" | awk '{print $1}' | tr -d ':'))
 for i in "${irqs[@]}"; do echo "$bitmask" > /proc/irq/"$i"/smp_affinity; done
+
+echo "Set affinity bitmask of IRQ ("${irqs[@]}") to ["$bitmask"] for device ["$dev_name"]"
