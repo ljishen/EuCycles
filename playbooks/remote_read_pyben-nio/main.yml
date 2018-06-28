@@ -16,26 +16,74 @@
         version: HEAD
       async: 30
       poll: 0
-    - name: pull or update image {{ perf_image_name }}
-      become: yes
-      docker_image:
-        force: yes
-        name: "{{ perf_image_name }}"
-        state: present
+    - name: install perf
+      apt:
+        install_recommends: no
+        name:
+          - linux-tools-common
+          - linux-tools-{{ ansible_kernel }}
+        state: latest
+        cache_valid_time: {{ 24 * 60 * 60 }}  # cache valid for one day
       async: "{{ 2 * 60 }}"
       poll: 2
+    - name: check kernel boot parameters
+      set_fact:
+        boot_params_invalid: >
+          {{ 'nr_cpus' is not in ansible_cmdline or ansible_cmdline.nr_cpus != '3' or 'isolcpus' is not in ansible_cmdline or ansible_cmdline.isolcpus != '1,2' }}
+    - name: check number of vCPUs
+      command: nproc
+      register: res_nproc
+      when: boot_params_invalid
+    - debug: msg="The system has only {{ res_nproc.stdout }} (< 3) virtual processors"
+      when: boot_params_invalid and res_nproc.stdout | int < 3
+      failed_when: true
+    - name: update kernel boot parameters
+      become: yes
+      command: >
+        sed -i 's/\(GRUB_CMDLINE_LINUX_DEFAULT=\).*$/\1"nr_cpus=3 isolcpus=1,2"/' /etc/default/grub
+        && update-grub
+      when: boot_params_invalid
+      async: 10
+      poll: 2
+
+- name: reboot if servers boot parameters updated
+  hosts: servers
+  become: yes
+  tasks:
+    - command: reboot
+      when: boot_params_invalid
+
+- name: reboot if client boot parameters updated
+  hosts: client
+  become: yes
+  tasks:
+    - command: reboot
+      when: boot_params_invalid
+
+- hosts: all
+  tasks:
+    - debug: msg="Exit if reboot scheduled."
+      failed_when: boot_params_invalid
+
+- name: config CPUs for IRQ handling
+  hosts: all
+  become: yes
+  tasks:
+    - name: config SMP IRQ affinity for network interrupts
+      shell: >
+      scripts/net_smp_affinity {{ net_dev_in_count }} {{ net_dev_in_count_cpu_mask }}
+      &&
+      scripts/net_smp_affinity {{ net_dev_out_of_count }} {{ net_dev_out_of_count_cpu_mask }}
+    - name: stop irqbalance service
+      service:
+        name: irqbalance
+        state: stopped
 
 - hosts: servers
   any_errors_fatal: true
   vars:
     data_file_path: "{{ workdir }}/{{ server_data_filename }}"
   tasks:
-    - name: stop running server
-      become: yes
-      docker_container:
-        force_kill: yes
-        name: "{{ perf_server_container_name }}"
-        state: absent
     - name: delete obsolate data file
       file:
         path: "{{ data_file_path }}"

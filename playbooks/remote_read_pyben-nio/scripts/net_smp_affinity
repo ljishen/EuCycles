@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+set -eu -o pipefail
+
+if [ "$#" -lt 2 ]; then
+    cat <<-ENDOFMESSAGE
+Usage: ./net_smp_affinity DEV_NAME CPU_BITMASK
+
+Config the CPUs specified by the CPU_BITMASK to handle the DEV_NAME related
+interrupts.
+
+The DEV_NAME is used to be searched and identified the interrupt numbers from
+the result of /proc/interrupts
+
+This script must be run as root!
+
+To see more detail:
+https://www.kernel.org/doc/Documentation/IRQ-affinity.txt
+ENDOFMESSAGE
+    exit
+fi
+
+if [ "$EUID" -ne 0 ]; then
+    echo "This script must be run as root!"
+    exit 1
+fi
+
+dev_name="$1"
+bitmask="$2"
+
+irqs=($(cat /proc/interrupts | grep "$dev_name" | awk '{print $1}' | tr -d ':'))
+for i in "${irqs[@]}"; do echo "$bitmask" > /proc/irq/"$i"/smp_affinity; done
