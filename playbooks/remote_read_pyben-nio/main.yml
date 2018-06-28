@@ -45,9 +45,9 @@
         backrefs: yes
         backup: yes
         create: no
-        line: '\1nr_cpus=3 isolcpus=1,2 \2'
+        line: '\1 nr_cpus=3 isolcpus=1,2"'
         path: /etc/default/grub
-        regexp: '^(GRUB_CMDLINE_LINUX_DEFAULT=")(.*)$'
+        regexp: '^(GRUB_CMDLINE_LINUX_DEFAULT="[^"]*)'
         state: present
       when: boot_params_invalid
     - name: update grub2 config file
@@ -74,6 +74,7 @@
 - hosts: all
   tasks:
     - debug: msg="Terminate if reboot scheduled."
+      # need this check if we are not running this playbook on any of the servers or client
       failed_when: boot_params_invalid
 
 - name: config CPUs for IRQ handling
