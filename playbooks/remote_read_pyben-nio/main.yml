@@ -1,6 +1,7 @@
 ---
 - name: ensure common prerequisites
   hosts: all
+  any_errors_fatal: true
   roles:
     - { role: ../common/roles/prerequisites, become: yes }
   tasks:
@@ -17,25 +18,26 @@
       async: 30
       poll: 0
     - name: install perf
+      become: yes
       apt:
         install_recommends: no
         name:
           - linux-tools-common
           - linux-tools-{{ ansible_kernel }}
         state: latest
-        cache_valid_time: {{ 24 * 60 * 60 }}  # cache valid for one day
+        cache_valid_time: "{{ 24 * 60 * 60 }}"  # cache valid for one day
       async: "{{ 2 * 60 }}"
       poll: 2
     - name: check kernel boot parameters
       set_fact:
         boot_params_invalid: >
-          {{ 'nr_cpus' is not in ansible_cmdline or ansible_cmdline.nr_cpus != '3' or 'isolcpus' is not in ansible_cmdline or ansible_cmdline.isolcpus != '1,2' }}
+          {{ 'nr_cpus' not in ansible_cmdline or ansible_cmdline.nr_cpus != '3' or 'isolcpus' not in ansible_cmdline or ansible_cmdline.isolcpus != '1,2' }}
     - name: check number of vCPUs
       command: nproc
-      register: res_nproc
+      register: cmd_nproc
       when: boot_params_invalid
-    - debug: msg="The system has only {{ res_nproc.stdout }} (< 3) virtual processors"
-      when: boot_params_invalid and res_nproc.stdout | int < 3
+    - debug: msg="The system has only {{ cmd_nproc.stdout }} (< 3) virtual processors"
+      when: cmd_nproc is defined and cmd_nproc.stdout | int < 3 and boot_params_invalid
       failed_when: true
     - name: update kernel boot parameters
       become: yes
@@ -48,6 +50,7 @@
 
 - name: reboot if servers boot parameters updated
   hosts: servers
+  any_errors_fatal: true
   become: yes
   tasks:
     - command: reboot
@@ -55,6 +58,7 @@
 
 - name: reboot if client boot parameters updated
   hosts: client
+  any_errors_fatal: true
   become: yes
   tasks:
     - command: reboot
@@ -67,13 +71,14 @@
 
 - name: config CPUs for IRQ handling
   hosts: all
+  any_errors_fatal: true
   become: yes
   tasks:
     - name: config SMP IRQ affinity for network interrupts
       shell: >
-      scripts/net_smp_affinity {{ net_dev_in_count }} {{ net_dev_in_count_cpu_mask }}
-      &&
-      scripts/net_smp_affinity {{ net_dev_out_of_count }} {{ net_dev_out_of_count_cpu_mask }}
+        scripts/net_smp_affinity {{ net_dev_in_count }} {{ net_dev_in_count_cpu_mask }}
+        &&
+        scripts/net_smp_affinity {{ net_dev_out_of_count }} {{ net_dev_out_of_count_cpu_mask }}
     - name: stop irqbalance service
       service:
         name: irqbalance
