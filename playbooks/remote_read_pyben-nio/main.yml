@@ -68,20 +68,13 @@
       meta: clear_facts
       when: boot_params_invalid
 
-- name: reboot if servers boot parameters updated
-  hosts: servers
+- name: reboot if boot parameters updated
+  hosts:
+    - servers
+    - client
   become: yes
   tasks:
     - command: reboot
-      ignore_errors: yes
-      when: boot_params_invalid
-
-- name: reboot if client boot parameters updated
-  hosts: client
-  become: yes
-  tasks:
-    - command: reboot
-      ignore_errors: yes
       when: boot_params_invalid
 
 - hosts: all
