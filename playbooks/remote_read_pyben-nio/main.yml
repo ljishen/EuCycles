@@ -1,6 +1,9 @@
 ---
 - name: ensure common prerequisites
   hosts: all
+  vars:
+    nr_cpus: '3'
+    isolcpus: '1,2'
   any_errors_fatal: true
   roles:
     - { role: ../common/roles/prerequisites, become: yes }
@@ -31,21 +34,26 @@
     - name: check kernel boot parameters
       set_fact:
         boot_params_invalid: >
-          {{ 'nr_cpus' not in ansible_cmdline or ansible_cmdline.nr_cpus != '3' or 'isolcpus' not in ansible_cmdline or ansible_cmdline.isolcpus != '1,2' }}
+          {{ 'nr_cpus' not in ansible_cmdline or ansible_cmdline.nr_cpus != nr_cpus or 'isolcpus' not in ansible_cmdline or ansible_cmdline.isolcpus != isolcpus }}
     - name: check number of vCPUs
       command: nproc
       register: cmd_nproc
       when: boot_params_invalid
-    - debug: msg="The system has only {{ cmd_nproc.stdout }} (< 3) virtual processors"
-      when: boot_params_invalid and cmd_nproc.stdout is defined and cmd_nproc.stdout | int < 3
+    - debug: msg="The system has only {{ cmd_nproc.stdout }} (< {{ nr_cpus }}) virtual processors"
+      when: boot_params_invalid and cmd_nproc.stdout is defined and cmd_nproc.stdout | int < nr_cpus | int
       failed_when: true
-    - name: update kernel boot parameters
+    - name: remove old kernel boot parameters
+      become: yes
+      command: >
+        sed -i 's/ *nr_cpus=[^ "]*\| *isolcpus=[^ "]*//g' /etc/default/grub
+      args:
+        warn: no
+      when: boot_params_invalid
+    - name: append kernel boot parameters
       become: yes
       lineinfile:
         backrefs: yes
-        backup: yes
-        create: no
-        line: '\1 nr_cpus=3 isolcpus=1,2"'
+        line: '\1 nr_cpus={{ nr_cpus }} isolcpus={{ isolcpus }}"'
         path: /etc/default/grub
         regexp: '^(GRUB_CMDLINE_LINUX_DEFAULT="[^"]*)'
         state: present
@@ -55,6 +63,9 @@
       command: update-grub
       async: 10
       poll: 2
+      when: boot_params_invalid
+    - name: clear the fact cache if boot parameters updated
+      meta: clear_facts
       when: boot_params_invalid
 
 - name: reboot if servers boot parameters updated
