@@ -55,6 +55,7 @@
     nr_cpus: '3'
     isolcpus: '1,2'
   any_errors_fatal: true
+  tasks:
     - name: fetch current kernel boot parameters
       setup:
         filter: ansible_cmdline
@@ -67,7 +68,7 @@
       register: cmd_nproc
       when: boot_params_invalid
     - debug: msg="The system has only {{ cmd_nproc.stdout }} (< {{ nr_cpus }}) virtual processors"
-      when: boot_params_invalid and cmd_nproc.stdout is defined and cmd_nproc.stdout | int < nr_cpus | int
+      when: not force_update_kernel_boot_parameters and boot_params_invalid and cmd_nproc.stdout is defined and cmd_nproc.stdout | int < nr_cpus | int
       failed_when: true
     - name: remove old kernel boot parameters
       become: yes
