@@ -31,6 +31,9 @@
         cache_valid_time: "{{ 24 * 60 * 60 }}"  # cache valid for one day
       async: "{{ 2 * 60 }}"
       poll: 2
+    - name: fetch current kernel boot parameters
+      setup:
+        filter: ansible_cmdline
     - name: check kernel boot parameters
       set_fact:
         boot_params_invalid: >
@@ -64,9 +67,6 @@
       async: 10
       poll: 2
       when: boot_params_invalid
-    - name: clear the fact cache if boot parameters updated
-      meta: clear_facts
-      when: boot_params_invalid
 
 - name: reboot if boot parameters updated
   hosts:
@@ -76,12 +76,6 @@
   tasks:
     - command: reboot
       when: boot_params_invalid
-
-- hosts: all
-  tasks:
-    - debug: msg="Terminate if reboot scheduled."
-      # need this check if we are not running this playbook on any of the servers or client
-      failed_when: boot_params_invalid
 
 - name: config CPUs for IRQ handling
   hosts: all
