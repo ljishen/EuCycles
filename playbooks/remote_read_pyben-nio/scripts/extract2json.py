@@ -3,6 +3,7 @@
 
 import argparse
 import json
+import locale
 import os
 import re
 
@@ -98,7 +99,7 @@ def __add_servers_data(logs_dir, data, size, index, num_servs):
                    value=bitrates_arr)
 
 
-PATTERN_CYCLES = re.compile(r'(\d+)\s+cycles')
+PATTERN_CYCLES = re.compile(r'([,\d]+)\s+cycles')
 PATTERN_BITRATE = re.compile(r'SUMMARY.+Bitrate:\s+([\d.]+)')
 
 
@@ -114,7 +115,7 @@ def __extract_from_file(file):
     matchobj = PATTERN_BITRATE.search(content)
     bitrate = matchobj.group(1)
 
-    return int(cycles), float(bitrate)
+    return locale.atoi(cycles), float(bitrate)
 
 
 def __set_arr_prop(data, *args, value=None):
@@ -135,4 +136,5 @@ def __set_arr_prop(data, *args, value=None):
 
 
 if __name__ == "__main__":
+    locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
     main()

@@ -2,30 +2,22 @@
 - block:
   - name: (servers {{ num_servs }}/{{ total_servs }}, round {{ index }}/{{ repetition }}, size {{ bytes }}) run the server
     become: yes
-    docker_container:
-      capabilities: SYS_ADMIN
-      command: >
-        stat
-        /root/pyben-nio/src/run
-        --server start
-        --bind {{ hostvars[groups['servers'][serv_idx | int]]['ansible_' + server_outbound_interface]['ipv4']['address'] }}
-        --size {{ lookup('template', 'templates/allocator.j2').split(',')[serv_idx | int] }}
-        --port {{ port }}
-        --filename /root/{{ server_data_filename }}
-        --bufsize {{ server_bufsize }}
-        --method "{{ server_filtering_method | replace('BIGGEST', sizes_idx) }}"
-      cpuset_cpus: "{{ perf_server_container_cpuset }}"
-      detach: no
-      force_kill: yes
-      image: "{{ perf_image_name }}"
-      name: "{{ perf_server_container_name }}"
-      network_mode: host
-      pull: no
-      recreate: yes
-      state: started
-      volumes:
-        - "{{ workdir }}/{{ server_data_filename }}:/root/{{ server_data_filename }}:ro"
-        - "{{ workdir }}/pyben-nio:/root/pyben-nio:ro"
+    # 1. Processor-wide mode of perf stat (-C)
+    #   https://perf.wiki.kernel.org/index.php/Tutorial#Processor-wide_mode
+    # 2. Pretty printing large numbers (-B)
+    #   https://perf.wiki.kernel.org/index.php/Tutorial#Pretty_printing_large_numbers
+    shell: >
+      LC_NUMERIC=en_US.UTF8
+      perf stat -B -C 1-2
+      taskset -c 2
+      {{ workdir }}/pyben-nio/src/run
+      --server start
+      --bind {{ hostvars[groups['servers'][serv_idx | int]]['ansible_' + server_outbound_interface]['ipv4']['address'] }}
+      --size {{ lookup('template', 'templates/allocator.j2').split(',')[serv_idx | int] }}
+      --port {{ port }}
+      --filename {{ workdir }}/{{ server_data_filename }}
+      --bufsize {{ server_bufsize }}
+      --method "{{ server_filtering_method | replace('BIGGEST', sizes_idx) }}"
     delegate_to: "{{ hostvars[groups['servers'][serv_idx | int]]['inventory_hostname'] }}"
     async: "{{ 2 * 60 * 60 }}"  # each task last for at most 2 hour
     poll: 0
@@ -40,31 +32,19 @@
 
   - name: (servers {{ num_servs }}/{{ total_servs }}, round {{ index }}/{{ repetition }}, size {{ bytes }}) run the client
     become: yes
-    docker_container:
-      capabilities: SYS_ADMIN
-      command: >
-        stat
-        /root/pyben-nio/src/run
-        --client start
-        --addresses
-          {%- for i in range(num_servs | int) %} {{ hostvars[groups['servers'][i]]['ansible_' + server_outbound_interface]['ipv4']['address'] }} {% endfor -%}
-        --size {{ dataset_size }}
-        --port {{ port }}
-        --bind {{ hostvars[groups['client'][0]]['ansible_' + client_incoming_interface]['ipv4']['address'] }}
-        --bufsize {{ client_bufsize }}
-        --method "{{ client_filtering_method }}"
-      cpuset_cpus:
-        "{{ perf_client_container_cpuset_start }}-{{ perf_client_container_cpuset_end if perf_client_container_cpuset_end is number else perf_client_container_cpuset_start + num_servs | int - 1 }}"
-      detach: no
-      force_kill: yes
-      image: "{{ perf_image_name }}"
-      name: "{{ perf_client_container_name }}"
-      network_mode: host
-      pull: no
-      recreate: yes
-      state: started
-      volumes:
-        - "{{ workdir }}/pyben-nio:/root/pyben-nio:ro"
+    shell: >
+      LC_NUMERIC=en_US.UTF8
+      perf stat -B -C 1-2
+      taskset -c 2
+      {{ workdir }}/pyben-nio/src/run
+      --client start
+      --addresses
+        {%- for i in range(num_servs | int) %} {{ hostvars[groups['servers'][i]]['ansible_' + server_outbound_interface]['ipv4']['address'] }} {% endfor -%}
+      --size {{ dataset_size }}
+      --port {{ port }}
+      --bind {{ hostvars[groups['client'][0]]['ansible_' + client_incoming_interface]['ipv4']['address'] }}
+      --bufsize {{ client_bufsize }}
+      --method "{{ client_filtering_method }}"
     delegate_to: "{{ hostvars[groups['client'][0]]['inventory_hostname'] }}"
     register: perf_client_result
 
@@ -82,7 +62,7 @@
   - name: (servers {{ num_servs }}/{{ total_servs }}, round {{ index }}/{{ repetition }}, size {{ bytes }}) save server outputs
     copy:
       backup: "{{ backup_results }}"
-      content: "{{ output_item.ansible_facts.docker_container.Output }}"
+      content: "{{ output_item.cmd }}\n\n{{ output_item.stderr }}"
       dest: "{{ output_dir }}/logs/perf_server_{{ bytes }}_{{ index }}_{{ num_servs }}servs_{{ output_item.result_item.serv_idx }}.log"
       force: yes
     loop: "{{ perf_server_async_poll_outputs.results }}"
@@ -93,7 +73,7 @@
   - name: (servers {{ num_servs }}/{{ total_servs }}, round {{ index }}/{{ repetition }}, size {{ bytes }}) save client output
     copy:
       backup: "{{ backup_results }}"
-      content: "{{ perf_client_result.ansible_facts.docker_container.Output }}"
+      content: "{{ perf_client_result.cmd }}\n\n{{ perf_client_result.stderr }}"
       dest: "{{ output_dir }}/logs/perf_client_{{ bytes }}_{{ index }}_{{ num_servs }}servs.log"
       force: yes
 
