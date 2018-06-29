@@ -108,6 +108,10 @@
   any_errors_fatal: true
   become: yes
   tasks:
+    - name: stop irqbalance service
+      service:
+        name: irqbalance
+        state: stopped
     - name: config SMP IRQ affinity for network interrupts
       script: >
         scripts/net_smp_affinity {{ net_dev_in_count }} {{ net_dev_in_count_cpu_mask }}
@@ -115,10 +119,6 @@
         scripts/net_smp_affinity {{ net_dev_out_of_count }} {{ net_dev_out_of_count_cpu_mask }}
       register: cmd_net_smp_affinity
     - debug: msg={{ cmd_net_smp_affinity.stdout_lines }}
-    - name: stop irqbalance service
-      service:
-        name: irqbalance
-        state: stopped
 
 - hosts: all
   vars:
