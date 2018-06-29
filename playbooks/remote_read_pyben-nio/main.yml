@@ -30,7 +30,7 @@
         state: latest
         cache_valid_time: "{{ 24 * 60 * 60 }}"  # cache valid for one day
       async: "{{ 2 * 60 }}"
-      poll: 2
+      poll: 1
     - name: fetch current kernel boot parameters
       setup:
         filter: ansible_cmdline
@@ -83,12 +83,12 @@
   become: yes
   tasks:
     - name: config SMP IRQ affinity for network interrupts
-      shell: >
+      script: >
         scripts/net_smp_affinity {{ net_dev_in_count }} {{ net_dev_in_count_cpu_mask }}
         &&
         scripts/net_smp_affinity {{ net_dev_out_of_count }} {{ net_dev_out_of_count_cpu_mask }}
       register: cmd_net_smp_affinity
-    - debug: msg=net_smp_affinity.stdout
+    - debug: msg={{ cmd_net_smp_affinity.stdout_lines }}
     - name: stop irqbalance service
       service:
         name: irqbalance
