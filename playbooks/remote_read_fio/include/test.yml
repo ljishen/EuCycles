@@ -40,12 +40,12 @@
     copy:
       backup: "{{ backup_results }}"
       content: "{{ perf_output.ansible_facts.docker_container.Output }}"
-      dest: "{{ output_dir }}/logs/perf_fio_{{ bytes }}_{{ index }}.log"
+      dest: "{{ logs_dir }}/perf_fio_{{ bytes }}_{{ index }}.log"
       force: yes
   - name: (index {{ index }}/{{ repetition }}, size {{ bytes }}) extract data
     command: >
       scripts/extract2csv.sh
-      {{ output_dir }}/logs/perf_fio_{{ bytes }}_{{ index }}.log
+      {{ logs_dir }}/perf_fio_{{ bytes }}_{{ index }}.log
       {{ output_dir }}/{{ result_filename }}
       {{ bytes if index == '1' else '' }}
     register: extract_data

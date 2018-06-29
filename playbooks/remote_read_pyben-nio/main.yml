@@ -120,9 +120,38 @@
         name: irqbalance
         state: stopped
 
+- hosts: all
+  vars:
+    iostat_log_file: "{{ workdir }}/{{ iostat_log_filename }}.{{ inventory_hostname }}"
+  tasks:
+    - name: backup {{ iostat_log_file }}
+      copy:
+        backup: yes
+        content: ""
+        dest: "{{ iostat_log_file }}"
+        force: yes
+    - name: run iostat in the background
+      shell: iostat -t 1 > {{ iostat_log_file }} 2>&1 &
+
 - name: run bench
   hosts: localhost
   vars:
     output_dir: "{{ playbook_dir }}/output"
+    logs_dir: "{{ output_dir }}/logs"
   tasks:
     - include_tasks: ../common/tasks/run_bench.yml
+
+- hosts: all
+  vars:
+    iostat_logs_dir: "{{ playbook_dir }}/output/logs/iostat/"
+  tasks:
+    - name: ensure the presence of {{ iostat_logs_dir }}
+      file:
+        path: "{{ iostat_logs_dir }}"
+        state: directory
+    - name: collect iostat logs
+      fetch:
+        dest: "{{ iostat_logs_dir }}"
+        fail_on_missing: yes
+        flat: yes
+        src: "{{ workdir }}/{{ iostat_log_filename }}.{{ inventory_hostname }}"

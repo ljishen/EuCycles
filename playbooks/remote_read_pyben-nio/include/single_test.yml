@@ -63,7 +63,7 @@
     copy:
       backup: "{{ backup_results }}"
       content: "{{ output_item.cmd }}\n\n{{ output_item.stderr }}"
-      dest: "{{ output_dir }}/logs/perf_server_{{ bytes }}_{{ index }}_{{ num_servs }}servs_{{ output_item.result_item.serv_idx }}.log"
+      dest: "{{ logs_dir }}/perf_server_{{ bytes }}_{{ index }}_{{ num_servs }}servs_{{ output_item.result_item.serv_idx }}.log"
       force: yes
     loop: "{{ perf_server_async_poll_outputs.results }}"
     loop_control:
@@ -74,7 +74,7 @@
     copy:
       backup: "{{ backup_results }}"
       content: "{{ perf_client_result.cmd }}\n\n{{ perf_client_result.stderr }}"
-      dest: "{{ output_dir }}/logs/perf_client_{{ bytes }}_{{ index }}_{{ num_servs }}servs.log"
+      dest: "{{ logs_dir }}/perf_client_{{ bytes }}_{{ index }}_{{ num_servs }}servs.log"
       force: yes
 
   - name: (servers {{ num_servs }}/{{ total_servs }}, round {{ index }}/{{ repetition }}, size {{ bytes }}) extract data
