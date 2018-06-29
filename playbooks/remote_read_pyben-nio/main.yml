@@ -18,13 +18,14 @@
       async: 30
       # we poll the result so that we know it fails if we didn't have write permission on {{ workdir }}
       poll: 1
-    - name: install perf
+    - name: install perf and iostat
       become: yes
       apt:
         install_recommends: no
         name:
           - linux-tools-common
           - linux-tools-{{ ansible_kernel }}
+          - sysstat
         state: latest
         cache_valid_time: "{{ 24 * 60 * 60 }}"  # cache valid for one day
       async: "{{ 2 * 60 }}"
