@@ -1,9 +1,6 @@
 ---
 - name: ensure common prerequisites
   hosts: all
-  vars:
-    nr_cpus: '3'
-    isolcpus: '1,2'
   any_errors_fatal: true
   roles:
     - { role: ../common/roles/prerequisites, become: yes }
@@ -32,6 +29,32 @@
         cache_valid_time: "{{ 24 * 60 * 60 }}"  # cache valid for one day
       async: "{{ 2 * 60 }}"
       poll: 1
+
+- hosts: servers
+  any_errors_fatal: true
+  vars:
+    data_file_path: "{{ workdir }}/{{ server_data_filename }}"
+  tasks:
+    - name: delete obsolate data file
+      file:
+        path: "{{ data_file_path }}"
+        state: absent
+      when: force_create_data_file
+    - name: create {{ server_data_file_size }} data file for read by the server
+      command: >
+        {{ workdir }}/pyben-nio/src/tools.py {{ server_data_file_size }}
+        --filename {{ workdir }}/{{ server_data_filename }}
+      args:
+        creates: "{{ workdir }}/{{ server_data_filename }}"
+      async: "{{ 10 * 60 * 60 }}"
+      poll: 30
+
+- name: config CPU isolation from the kernel scheduler
+  hosts: all
+  vars:
+    nr_cpus: '3'
+    isolcpus: '1,2'
+  any_errors_fatal: true
     - name: fetch current kernel boot parameters
       setup:
         filter: ansible_cmdline
@@ -94,25 +117,6 @@
       service:
         name: irqbalance
         state: stopped
-
-- hosts: servers
-  any_errors_fatal: true
-  vars:
-    data_file_path: "{{ workdir }}/{{ server_data_filename }}"
-  tasks:
-    - name: delete obsolate data file
-      file:
-        path: "{{ data_file_path }}"
-        state: absent
-      when: force_create_data_file
-    - name: create {{ server_data_file_size }} data file for read by the server
-      command: >
-        {{ workdir }}/pyben-nio/src/tools.py {{ server_data_file_size }}
-        --filename {{ workdir }}/{{ server_data_filename }}
-      args:
-        creates: "{{ workdir }}/{{ server_data_filename }}"
-      async: "{{ 10 * 60 * 60 }}"
-      poll: 30
 
 - name: run bench
   hosts: localhost
