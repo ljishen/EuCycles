@@ -123,6 +123,7 @@
 - hosts: all
   vars:
     iostat_log_file: "{{ workdir }}/{{ iostat_log_filename }}.{{ inventory_hostname }}"
+    iostat_pid_file: "{{ workdir }}/{{ iostat_pid_filename }}"
   tasks:
     - name: backup {{ iostat_log_file }}
       copy:
@@ -130,8 +131,16 @@
         content: ""
         dest: "{{ iostat_log_file }}"
         force: yes
-    - name: run iostat in the background
-      shell: iostat -t 1 > {{ iostat_log_file }} 2>&1 &
+    - name: stop iostat daemon if necessary
+      shell: kill $(cat {{ iostat_pid_file }}) ; rm {{ iostat_pid_file }}
+      args:
+        removes: "{{ iostat_pid_file }}"
+    - name: run iostat as daemon
+      # we use stdbuf to turn off the buffering of the output redirection.
+      #   https://linux.die.net/man/1/stdbuf
+      #   https://stackoverflow.com/a/1429973
+      shell: >
+        stdbuf -oL -eL iostat -t 1 > {{ iostat_log_file }} 2>&1 & echo $! > {{ iostat_pid_file }}
 
 - name: run bench
   hosts: localhost
@@ -144,11 +153,16 @@
 - hosts: all
   vars:
     iostat_logs_dir: "{{ playbook_dir }}/output/logs/iostat/"
+    iostat_pid_file: "{{ workdir }}/{{ iostat_pid_filename }}"
   tasks:
     - name: ensure the presence of {{ iostat_logs_dir }}
       file:
         path: "{{ iostat_logs_dir }}"
         state: directory
+    - name: stop iostat daemon
+      shell: kill $(cat {{ iostat_pid_file }}) ; rm {{ iostat_pid_file }}
+      args:
+        removes: "{{ iostat_pid_file }}"
     - name: collect iostat logs
       fetch:
         dest: "{{ iostat_logs_dir }}"
