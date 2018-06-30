@@ -1,5 +1,13 @@
 ---
 - block:
+  - name: (servers {{ num_servs }}/{{ total_servs }}, round {{ index }}/{{ repetition }}, size {{ bytes }}) check/kill the server/client
+    become: yes
+    # see https://stackoverflow.com/a/9375940
+    shell: kill -KILL $(ps -ef | egrep '[p]yben-nio' | awk '{print $2}')
+    ignore_errors: yes
+    delegate_to: "{{ hostvars[item]['inventory_hostname'] }}"
+    with_items: "{{ groups['all'] }}"
+
   - name: (servers {{ num_servs }}/{{ total_servs }}, round {{ index }}/{{ repetition }}, size {{ bytes }}) run the server
     become: yes
     # 1. Processor-wide mode of perf stat (-C)
