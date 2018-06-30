@@ -1,0 +1,25 @@
+LC_NUMERIC=en_US.UTF8 perf stat -B -C 1-2 taskset -c 2 /tmp/eucycles/pyben-nio/src/run --client start --addresses 10.10.1.2 --size 512MB --port 8881 --bind 10.10.1.1 --bufsize 50mb --method "raw"
+
+2018-06-29 19:04:59,850 | client           | INFO     | PID=23496 | [bufsize: 52428800 bytes]
+2018-06-29 19:04:59,873 | client           | INFO     | PID=23497 | Connecting to server 10.10.1.2 on port 8881
+2018-06-29 19:04:59,874 | client           | INFO     | PID=23497 | Connection established. Receiving data ...
+2018-06-29 19:04:59,874 | methods.raw      | INFO     | PID=23497 | [method: methods.raw]
+2018-06-29 19:04:59,874 | methods.raw      | INFO     | PID=23497 | [method parameters: {}]
+2018-06-29 19:08:55,624 | client           | INFO     | PID=23497 | [Received: 0 bytes (0 raw bytes)] [Duration: 235.7292001247406 seconds] [Bitrate: 0.0 bit/s]
+2018-06-29 19:08:55,624 | client           | INFO     | PID=23497 | Socket closed
+2018-06-29 19:08:55,638 | client           | INFO     | PID=23496 | [SUMMARY] [Received: 0 bytes] [Duration: 235.7292001247406 seconds] [Bitrate: 0.0 bit/s]
+
+ Performance counter stats for 'CPU(s) 1-2':
+
+     471701.356015      task-clock (msec)         #    2.000 CPUs utilized            (100.00%)
+             5,296      context-switches          #    0.011 K/sec                    (100.00%)
+                 1      cpu-migrations            #    0.000 K/sec                    (100.00%)
+            19,246      page-faults               #    0.041 K/sec                  
+     2,238,160,079      cycles                    #    0.005 GHz                      (100.00%)
+   <not supported>      stalled-cycles-frontend  
+   <not supported>      stalled-cycles-backend   
+       692,716,352      instructions              #    0.31  insns per cycle          (100.00%)
+       179,005,783      branches                  #    0.379 M/sec                    (100.00%)
+         3,662,570      branch-misses             #    2.05% of all branches        
+
+     235.862026273 seconds time elapsed

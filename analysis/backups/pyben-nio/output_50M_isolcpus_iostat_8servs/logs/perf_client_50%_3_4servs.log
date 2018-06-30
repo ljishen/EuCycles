@@ -1,0 +1,43 @@
+LC_NUMERIC=en_US.UTF8 perf stat -B -C 1-2 taskset -c 2 /tmp/eucycles/pyben-nio/src/run --client start --addresses 10.10.1.2  10.10.1.3  10.10.1.4  10.10.1.5 --size 512MB --port 8881 --bind 10.10.1.1 --bufsize 50mb --method "raw"
+
+2018-06-29 23:33:37,251 | client           | INFO     | PID=997 | [bufsize: 52428800 bytes]
+2018-06-29 23:33:37,280 | client           | INFO     | PID=1001 | Connecting to server 10.10.1.2 on port 8881
+2018-06-29 23:33:37,281 | client           | INFO     | PID=1000 | Connecting to server 10.10.1.3 on port 8881
+2018-06-29 23:33:37,281 | client           | INFO     | PID=999 | Connecting to server 10.10.1.4 on port 8881
+2018-06-29 23:33:37,282 | client           | INFO     | PID=1000 | Connection established. Receiving data ...
+2018-06-29 23:33:37,282 | methods.raw      | INFO     | PID=1000 | [method: methods.raw]
+2018-06-29 23:33:37,282 | methods.raw      | INFO     | PID=1000 | [method parameters: {}]
+2018-06-29 23:33:37,287 | client           | INFO     | PID=1001 | Connection established. Receiving data ...
+2018-06-29 23:33:37,287 | methods.raw      | INFO     | PID=1001 | [method: methods.raw]
+2018-06-29 23:33:37,288 | methods.raw      | INFO     | PID=1001 | [method parameters: {}]
+2018-06-29 23:33:37,291 | client           | INFO     | PID=999 | Connection established. Receiving data ...
+2018-06-29 23:33:37,291 | methods.raw      | INFO     | PID=999 | [method: methods.raw]
+2018-06-29 23:33:37,292 | methods.raw      | INFO     | PID=999 | [method parameters: {}]
+2018-06-29 23:33:37,296 | client           | INFO     | PID=998 | Connecting to server 10.10.1.5 on port 8881
+2018-06-29 23:33:37,296 | client           | INFO     | PID=998 | Connection established. Receiving data ...
+2018-06-29 23:33:37,296 | methods.raw      | INFO     | PID=998 | [method: methods.raw]
+2018-06-29 23:33:37,296 | methods.raw      | INFO     | PID=998 | [method parameters: {}]
+2018-06-29 23:34:37,594 | client           | INFO     | PID=1000 | [Received: 67090256 bytes (67090256 raw bytes)] [Duration: 60.231598138809204 seconds] [Bitrate: 8910971.393504703 bit/s]
+2018-06-29 23:34:37,595 | client           | INFO     | PID=1000 | Socket closed
+2018-06-29 23:34:37,871 | client           | INFO     | PID=999 | [Received: 67098552 bytes (67098552 raw bytes)] [Duration: 60.50646615028381 seconds] [Bitrate: 8871587.619523903 bit/s]
+2018-06-29 23:34:37,880 | client           | INFO     | PID=999 | Socket closed
+2018-06-29 23:34:38,188 | client           | INFO     | PID=1001 | [Received: 67109793 bytes (67109793 raw bytes)] [Duration: 60.82408595085144 seconds] [Bitrate: 8826739.203838123 bit/s]
+2018-06-29 23:34:38,188 | client           | INFO     | PID=1001 | Socket closed
+2018-06-29 23:34:38,502 | client           | INFO     | PID=998 | [Received: 67101833 bytes (67101833 raw bytes)] [Duration: 61.135737895965576 seconds] [Bitrate: 8780701.476336071 bit/s]
+2018-06-29 23:34:38,503 | client           | INFO     | PID=998 | Socket closed
+2018-06-29 23:34:38,753 | client           | INFO     | PID=997 | [SUMMARY] [Received: 268400434 bytes (100.000% of 268400434 raw bytes)] [Duration: 61.13958406448364 seconds] [Bitrate: 35119693.80974778 bit/s]
+
+ Performance counter stats for 'CPU(s) 1-2':
+
+     123146.822009      task-clock (msec)         #    2.000 CPUs utilized            (100.00%)
+             2,145      context-switches          #    0.017 K/sec                    (100.00%)
+                 1      cpu-migrations            #    0.000 K/sec                    (100.00%)
+           640,351      page-faults               #    0.005 M/sec                  
+    10,373,114,450      cycles                    #    0.084 GHz                      (100.00%)
+   <not supported>      stalled-cycles-frontend  
+   <not supported>      stalled-cycles-backend   
+    23,024,624,073      instructions              #    2.22  insns per cycle          (100.00%)
+     6,036,756,707      branches                  #   49.021 M/sec                    (100.00%)
+        12,256,547      branch-misses             #    0.20% of all branches        
+
+      61.576247632 seconds time elapsed

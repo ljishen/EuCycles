@@ -1,0 +1,37 @@
+LC_NUMERIC=en_US.UTF8 perf stat -B -C 1-2 taskset -c 2 /tmp/eucycles/pyben-nio/src/run --client start --addresses 10.10.1.2  10.10.1.3  10.10.1.4 --size 512MB --port 8881 --bind 10.10.1.1 --bufsize 50mb --method "raw"
+
+2018-06-29 19:42:23,205 | client           | INFO     | PID=1028 | [bufsize: 52428800 bytes]
+2018-06-29 19:42:23,232 | client           | INFO     | PID=1031 | Connecting to server 10.10.1.2 on port 8881
+2018-06-29 19:42:23,233 | client           | INFO     | PID=1030 | Connecting to server 10.10.1.3 on port 8881
+2018-06-29 19:42:23,233 | client           | INFO     | PID=1031 | Connection established. Receiving data ...
+2018-06-29 19:42:23,233 | methods.raw      | INFO     | PID=1031 | [method: methods.raw]
+2018-06-29 19:42:23,234 | methods.raw      | INFO     | PID=1031 | [method parameters: {}]
+2018-06-29 19:42:23,239 | client           | INFO     | PID=1030 | Connection established. Receiving data ...
+2018-06-29 19:42:23,239 | methods.raw      | INFO     | PID=1030 | [method: methods.raw]
+2018-06-29 19:42:23,240 | methods.raw      | INFO     | PID=1030 | [method parameters: {}]
+2018-06-29 19:42:23,244 | client           | INFO     | PID=1029 | Connecting to server 10.10.1.4 on port 8881
+2018-06-29 19:42:23,244 | client           | INFO     | PID=1029 | Connection established. Receiving data ...
+2018-06-29 19:42:23,244 | methods.raw      | INFO     | PID=1029 | [method: methods.raw]
+2018-06-29 19:42:23,244 | methods.raw      | INFO     | PID=1029 | [method parameters: {}]
+2018-06-29 19:43:32,641 | client           | INFO     | PID=1031 | [Received: 17894941 bytes (17894941 raw bytes)] [Duration: 69.3548309803009 seconds] [Bitrate: 2064160.866323243 bit/s]
+2018-06-29 19:43:32,641 | client           | INFO     | PID=1031 | Socket closed
+2018-06-29 19:43:32,819 | client           | INFO     | PID=1029 | [Received: 17883444 bytes (17883444 raw bytes)] [Duration: 69.52173805236816 seconds] [Bitrate: 2057882.268309122 bit/s]
+2018-06-29 19:43:32,819 | client           | INFO     | PID=1029 | Socket closed
+2018-06-29 19:43:32,947 | client           | INFO     | PID=1030 | [Received: 17892712 bytes (17892712 raw bytes)] [Duration: 69.65550994873047 seconds] [Bitrate: 2054994.588444742 bit/s]
+2018-06-29 19:43:32,947 | client           | INFO     | PID=1030 | Socket closed
+2018-06-29 19:43:33,033 | client           | INFO     | PID=1028 | [SUMMARY] [Received: 53671097 bytes (100.000% of 53671097 raw bytes)] [Duration: 69.66061091423035 seconds] [Bitrate: 6163723.951957017 bit/s]
+
+ Performance counter stats for 'CPU(s) 1-2':
+
+     139799.521133      task-clock (msec)         #    2.000 CPUs utilized            (100.00%)
+             1,722      context-switches          #    0.012 K/sec                    (100.00%)
+                 1      cpu-migrations            #    0.000 K/sec                    (100.00%)
+           159,659      page-faults               #    0.001 M/sec                  
+     2,989,682,812      cycles                    #    0.021 GHz                      (100.00%)
+   <not supported>      stalled-cycles-frontend  
+   <not supported>      stalled-cycles-backend   
+     5,028,958,618      instructions              #    1.68  insns per cycle          (100.00%)
+     1,303,396,806      branches                  #    9.323 M/sec                    (100.00%)
+         4,521,579      branch-misses             #    0.35% of all branches        
+
+      69.903003232 seconds time elapsed

@@ -1,0 +1,25 @@
+LC_NUMERIC=en_US.UTF8 perf stat -B -C 1-2 taskset -c 2 /tmp/eucycles/pyben-nio/src/run --client start --addresses 10.10.1.2 --size 512MB --port 8881 --bind 10.10.1.1 --bufsize 50mb --method "raw"
+
+2018-06-29 18:49:32,123 | client           | INFO     | PID=18904 | [bufsize: 52428800 bytes]
+2018-06-29 18:49:32,146 | client           | INFO     | PID=18905 | Connecting to server 10.10.1.2 on port 8881
+2018-06-29 18:49:32,147 | client           | INFO     | PID=18905 | Connection established. Receiving data ...
+2018-06-29 18:49:32,147 | methods.raw      | INFO     | PID=18905 | [method: methods.raw]
+2018-06-29 18:49:32,147 | methods.raw      | INFO     | PID=18905 | [method parameters: {}]
+2018-06-29 18:53:26,854 | client           | INFO     | PID=18905 | [Received: 0 bytes (0 raw bytes)] [Duration: 234.68630719184875 seconds] [Bitrate: 0.0 bit/s]
+2018-06-29 18:53:26,855 | client           | INFO     | PID=18905 | Socket closed
+2018-06-29 18:53:26,910 | client           | INFO     | PID=18904 | [SUMMARY] [Received: 0 bytes] [Duration: 234.68630719184875 seconds] [Bitrate: 0.0 bit/s]
+
+ Performance counter stats for 'CPU(s) 1-2':
+
+     469699.973226      task-clock (msec)         #    2.000 CPUs utilized            (100.00%)
+             5,432      context-switches          #    0.012 K/sec                    (100.00%)
+                 1      cpu-migrations            #    0.000 K/sec                    (100.00%)
+            19,250      page-faults               #    0.041 K/sec                  
+     2,360,455,376      cycles                    #    0.005 GHz                      (100.00%)
+   <not supported>      stalled-cycles-frontend  
+   <not supported>      stalled-cycles-backend   
+       770,788,199      instructions              #    0.33  insns per cycle          (100.00%)
+       193,707,883      branches                  #    0.412 M/sec                    (100.00%)
+         4,289,366      branch-misses             #    2.21% of all branches        
+
+     234.861289563 seconds time elapsed

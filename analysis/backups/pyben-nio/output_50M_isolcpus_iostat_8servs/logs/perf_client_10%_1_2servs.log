@@ -1,0 +1,31 @@
+LC_NUMERIC=en_US.UTF8 perf stat -B -C 1-2 taskset -c 2 /tmp/eucycles/pyben-nio/src/run --client start --addresses 10.10.1.2  10.10.1.3 --size 512MB --port 8881 --bind 10.10.1.1 --bufsize 50mb --method "raw"
+
+2018-06-29 19:40:07,064 | client           | INFO     | PID=591 | [bufsize: 52428800 bytes]
+2018-06-29 19:40:07,089 | client           | INFO     | PID=593 | Connecting to server 10.10.1.2 on port 8881
+2018-06-29 19:40:07,090 | client           | INFO     | PID=592 | Connecting to server 10.10.1.3 on port 8881
+2018-06-29 19:40:07,091 | client           | INFO     | PID=593 | Connection established. Receiving data ...
+2018-06-29 19:40:07,091 | methods.raw      | INFO     | PID=593 | [method: methods.raw]
+2018-06-29 19:40:07,091 | methods.raw      | INFO     | PID=593 | [method parameters: {}]
+2018-06-29 19:40:07,095 | client           | INFO     | PID=592 | Connection established. Receiving data ...
+2018-06-29 19:40:07,095 | methods.raw      | INFO     | PID=592 | [method: methods.raw]
+2018-06-29 19:40:07,096 | methods.raw      | INFO     | PID=592 | [method parameters: {}]
+2018-06-29 19:41:50,891 | client           | INFO     | PID=593 | [Received: 26842296 bytes (26842296 raw bytes)] [Duration: 103.75763010978699 seconds] [Bitrate: 2069615.196229744 bit/s]
+2018-06-29 19:41:50,891 | client           | INFO     | PID=593 | Socket closed
+2018-06-29 19:41:52,036 | client           | INFO     | PID=592 | [Received: 26839488 bytes (26839488 raw bytes)] [Duration: 104.90350794792175 seconds] [Bitrate: 2046794.3179420985 bit/s]
+2018-06-29 19:41:52,036 | client           | INFO     | PID=592 | Socket closed
+2018-06-29 19:41:52,215 | client           | INFO     | PID=591 | [SUMMARY] [Received: 53681784 bytes (100.000% of 53681784 raw bytes)] [Duration: 104.90350794792175 seconds] [Bitrate: 4093802.7755296617 bit/s]
+
+ Performance counter stats for 'CPU(s) 1-2':
+
+     210441.277152      task-clock (msec)         #    2.000 CPUs utilized            (100.00%)
+             2,544      context-switches          #    0.012 K/sec                    (100.00%)
+                 1      cpu-migrations            #    0.000 K/sec                    (100.00%)
+           145,758      page-faults               #    0.693 K/sec                  
+     3,220,068,162      cycles                    #    0.015 GHz                      (100.00%)
+   <not supported>      stalled-cycles-frontend  
+   <not supported>      stalled-cycles-backend   
+     5,034,903,594      instructions              #    1.56  insns per cycle          (100.00%)
+     1,310,701,943      branches                  #    6.228 M/sec                    (100.00%)
+         4,613,090      branch-misses             #    0.35% of all branches        
+
+     105.225607156 seconds time elapsed
