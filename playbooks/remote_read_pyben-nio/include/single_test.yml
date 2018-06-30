@@ -6,6 +6,8 @@
     shell: kill -KILL $(ps -ef | egrep '[p]yben-nio.+start' | awk '{print $2}')
     ignore_errors: yes
     delegate_to: "{{ hostvars[item]['inventory_hostname'] }}"
+    async: 5
+    poll: 1
     with_items: "{{ groups['all'] }}"
 
   - name: (servers {{ num_servs }}/{{ total_servs }}, round {{ index }}/{{ repetition }}, size {{ bytes }}) run the server
