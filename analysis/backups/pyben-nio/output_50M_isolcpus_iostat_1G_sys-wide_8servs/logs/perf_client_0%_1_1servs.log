@@ -1,0 +1,25 @@
+LC_NUMERIC=en_US.UTF8 perf stat -B -a taskset -c 2 /tmp/eucycles/pyben-nio/src/run --client start --addresses 10.10.1.2 --size 1GB --port 8881 --bind 10.10.1.1 --bufsize 50mb --method "raw"
+
+2018-07-01 00:53:49,624 | client           | INFO     | PID=13088 | [bufsize: 52428800 bytes]
+2018-07-01 00:53:49,648 | client           | INFO     | PID=13089 | Connecting to server 10.10.1.2 on port 8881
+2018-07-01 00:53:49,649 | client           | INFO     | PID=13089 | Connection established. Receiving data ...
+2018-07-01 00:53:49,649 | methods.raw      | INFO     | PID=13089 | [method: methods.raw]
+2018-07-01 00:53:49,649 | methods.raw      | INFO     | PID=13089 | [method parameters: {}]
+2018-07-01 01:01:55,737 | client           | INFO     | PID=13089 | [Received: 0 bytes (0 raw bytes)] [Duration: 486.06680512428284 seconds] [Bitrate: 0.0 bit/s]
+2018-07-01 01:01:55,737 | client           | INFO     | PID=13089 | Socket closed
+2018-07-01 01:01:55,795 | client           | INFO     | PID=13088 | [SUMMARY] [Received: 0 bytes] [Duration: 486.06680512428284 seconds] [Bitrate: 0.0 bit/s]
+
+ Performance counter stats for 'system wide':
+
+    1458665.154642      task-clock (msec)         #    3.000 CPUs utilized            (100.00%)
+         1,005,611      context-switches          #    0.689 K/sec                    (100.00%)
+                 1      cpu-migrations            #    0.000 K/sec                    (100.00%)
+            25,682      page-faults               #    0.018 K/sec                  
+    28,331,501,834      cycles                    #    0.019 GHz                      (100.00%)
+   <not supported>      stalled-cycles-frontend  
+   <not supported>      stalled-cycles-backend   
+    22,901,579,548      instructions              #    0.81  insns per cycle          (100.00%)
+     4,937,074,255      branches                  #    3.385 M/sec                    (100.00%)
+        43,526,235      branch-misses             #    0.88% of all branches        
+
+     486.245264568 seconds time elapsed

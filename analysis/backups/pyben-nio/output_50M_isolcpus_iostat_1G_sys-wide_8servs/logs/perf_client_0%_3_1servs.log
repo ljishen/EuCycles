@@ -1,0 +1,25 @@
+LC_NUMERIC=en_US.UTF8 perf stat -B -a taskset -c 2 /tmp/eucycles/pyben-nio/src/run --client start --addresses 10.10.1.2 --size 1GB --port 8881 --bind 10.10.1.1 --bufsize 50mb --method "raw"
+
+2018-07-01 01:47:59,172 | client           | INFO     | PID=22419 | [bufsize: 52428800 bytes]
+2018-07-01 01:47:59,196 | client           | INFO     | PID=22420 | Connecting to server 10.10.1.2 on port 8881
+2018-07-01 01:47:59,196 | client           | INFO     | PID=22420 | Connection established. Receiving data ...
+2018-07-01 01:47:59,196 | methods.raw      | INFO     | PID=22420 | [method: methods.raw]
+2018-07-01 01:47:59,196 | methods.raw      | INFO     | PID=22420 | [method parameters: {}]
+2018-07-01 01:55:56,604 | client           | INFO     | PID=22420 | [Received: 0 bytes (0 raw bytes)] [Duration: 477.3861348628998 seconds] [Bitrate: 0.0 bit/s]
+2018-07-01 01:55:56,604 | client           | INFO     | PID=22420 | Socket closed
+2018-07-01 01:55:56,633 | client           | INFO     | PID=22419 | [SUMMARY] [Received: 0 bytes] [Duration: 477.3861348628998 seconds] [Bitrate: 0.0 bit/s]
+
+ Performance counter stats for 'system wide':
+
+    1432536.203043      task-clock (msec)         #    3.000 CPUs utilized            (100.00%)
+           986,318      context-switches          #    0.689 K/sec                    (100.00%)
+                 1      cpu-migrations            #    0.000 K/sec                    (100.00%)
+            24,630      page-faults               #    0.017 K/sec                  
+    27,530,540,635      cycles                    #    0.019 GHz                      (100.00%)
+   <not supported>      stalled-cycles-frontend  
+   <not supported>      stalled-cycles-backend   
+    22,344,806,600      instructions              #    0.81  insns per cycle          (100.00%)
+     4,806,278,963      branches                  #    3.355 M/sec                    (100.00%)
+        42,199,277      branch-misses             #    0.88% of all branches        
+
+     477.535186723 seconds time elapsed
