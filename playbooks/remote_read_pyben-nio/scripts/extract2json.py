@@ -129,7 +129,7 @@ def __set_arr_prop(data, *args, value=None):
     if name not in obj:
         obj[name] = []
 
-    if value:
+    if value is not None:
         obj[name].append(value)
 
     return obj[name]
