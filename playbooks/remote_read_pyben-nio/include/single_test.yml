@@ -3,7 +3,7 @@
   - name: (servers {{ num_servs }}/{{ total_servs }}, round {{ index }}/{{ repetition }}, size {{ bytes }}) check/kill the server/client
     become: yes
     # see https://stackoverflow.com/a/9375940
-    shell: kill -KILL $(ps -ef | egrep '[p]yben-nio.+start' | awk '{print $2}')
+    shell: pkill -KILL -u "$(id -u)" -f 'pyben\-nio.+start'
     ignore_errors: yes
     delegate_to: "{{ hostvars[item]['inventory_hostname'] }}"
     with_items: "{{ groups['all'] }}"
