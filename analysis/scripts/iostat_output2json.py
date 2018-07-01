@@ -62,7 +62,7 @@ def __calc_sum_of_busyness(
 
         if num_in_cur_line:
             idle_percentage = float(line.split()[-1])
-            print(idle_percentage)
+            # print(idle_percentage)
             sum_of_busyness += 100 - idle_percentage
             num_in_cur_line = False
 
