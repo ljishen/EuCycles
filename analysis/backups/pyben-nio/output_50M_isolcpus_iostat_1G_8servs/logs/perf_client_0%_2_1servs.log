@@ -1,0 +1,25 @@
+LC_NUMERIC=en_US.UTF8 perf stat -B -C 1-2 taskset -c 2 /tmp/eucycles/pyben-nio/src/run --client start --addresses 10.10.1.2 --size 1GB --port 8881 --bind 10.10.1.1 --bufsize 50mb --method "raw"
+
+2018-06-30 10:26:54,454 | client           | INFO     | PID=3650 | [bufsize: 52428800 bytes]
+2018-06-30 10:26:54,478 | client           | INFO     | PID=3651 | Connecting to server 10.10.1.2 on port 8881
+2018-06-30 10:26:54,479 | client           | INFO     | PID=3651 | Connection established. Receiving data ...
+2018-06-30 10:26:54,479 | methods.raw      | INFO     | PID=3651 | [method: methods.raw]
+2018-06-30 10:26:54,479 | methods.raw      | INFO     | PID=3651 | [method parameters: {}]
+2018-06-30 10:34:50,377 | client           | INFO     | PID=3651 | [Received: 0 bytes (0 raw bytes)] [Duration: 475.87762808799744 seconds] [Bitrate: 0.0 bit/s]
+2018-06-30 10:34:50,378 | client           | INFO     | PID=3651 | Socket closed
+2018-06-30 10:34:50,414 | client           | INFO     | PID=3650 | [SUMMARY] [Received: 0 bytes] [Duration: 475.87762808799744 seconds] [Bitrate: 0.0 bit/s]
+
+ Performance counter stats for 'CPU(s) 1-2':
+
+     952022.231597      task-clock (msec)         #    2.000 CPUs utilized            (100.00%)
+            10,554      context-switches          #    0.011 K/sec                    (100.00%)
+                 1      cpu-migrations            #    0.000 K/sec                    (100.00%)
+            19,253      page-faults               #    0.020 K/sec                  
+     4,180,815,442      cycles                    #    0.004 GHz                      (100.00%)
+   <not supported>      stalled-cycles-frontend  
+   <not supported>      stalled-cycles-backend   
+     1,037,735,375      instructions              #    0.25  insns per cycle          (100.00%)
+       284,634,130      branches                  #    0.299 M/sec                    (100.00%)
+         4,762,233      branch-misses             #    1.67% of all branches        
+
+     476.034201749 seconds time elapsed

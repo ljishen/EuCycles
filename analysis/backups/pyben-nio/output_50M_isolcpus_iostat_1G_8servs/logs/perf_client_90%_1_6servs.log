@@ -1,0 +1,55 @@
+LC_NUMERIC=en_US.UTF8 perf stat -B -C 1-2 taskset -c 2 /tmp/eucycles/pyben-nio/src/run --client start --addresses 10.10.1.2  10.10.1.3  10.10.1.4  10.10.1.5  10.10.1.6  10.10.1.7 --size 1GB --port 8881 --bind 10.10.1.1 --bufsize 50mb --method "raw"
+
+2018-06-30 22:39:31,622 | client           | INFO     | PID=30699 | [bufsize: 52428800 bytes]
+2018-06-30 22:39:31,654 | client           | INFO     | PID=30703 | Connecting to server 10.10.1.2 on port 8881
+2018-06-30 22:39:31,655 | client           | INFO     | PID=30702 | Connecting to server 10.10.1.3 on port 8881
+2018-06-30 22:39:31,655 | client           | INFO     | PID=30703 | Connection established. Receiving data ...
+2018-06-30 22:39:31,655 | methods.raw      | INFO     | PID=30703 | [method: methods.raw]
+2018-06-30 22:39:31,656 | methods.raw      | INFO     | PID=30703 | [method parameters: {}]
+2018-06-30 22:39:31,659 | client           | INFO     | PID=30702 | Connection established. Receiving data ...
+2018-06-30 22:39:31,659 | methods.raw      | INFO     | PID=30702 | [method: methods.raw]
+2018-06-30 22:39:31,660 | methods.raw      | INFO     | PID=30702 | [method parameters: {}]
+2018-06-30 22:39:31,664 | client           | INFO     | PID=30704 | Connecting to server 10.10.1.4 on port 8881
+2018-06-30 22:39:31,664 | client           | INFO     | PID=30704 | Connection established. Receiving data ...
+2018-06-30 22:39:31,664 | methods.raw      | INFO     | PID=30704 | [method: methods.raw]
+2018-06-30 22:39:31,665 | methods.raw      | INFO     | PID=30704 | [method parameters: {}]
+2018-06-30 22:39:31,668 | client           | INFO     | PID=30705 | Connecting to server 10.10.1.5 on port 8881
+2018-06-30 22:39:31,668 | client           | INFO     | PID=30705 | Connection established. Receiving data ...
+2018-06-30 22:39:31,668 | methods.raw      | INFO     | PID=30705 | [method: methods.raw]
+2018-06-30 22:39:31,668 | methods.raw      | INFO     | PID=30705 | [method parameters: {}]
+2018-06-30 22:39:31,672 | client           | INFO     | PID=30701 | Connecting to server 10.10.1.6 on port 8881
+2018-06-30 22:39:31,673 | client           | INFO     | PID=30700 | Connecting to server 10.10.1.7 on port 8881
+2018-06-30 22:39:31,673 | client           | INFO     | PID=30701 | Connection established. Receiving data ...
+2018-06-30 22:39:31,673 | methods.raw      | INFO     | PID=30701 | [method: methods.raw]
+2018-06-30 22:39:31,673 | methods.raw      | INFO     | PID=30701 | [method parameters: {}]
+2018-06-30 22:39:31,675 | client           | INFO     | PID=30700 | Connection established. Receiving data ...
+2018-06-30 22:39:31,675 | methods.raw      | INFO     | PID=30700 | [method: methods.raw]
+2018-06-30 22:39:31,676 | methods.raw      | INFO     | PID=30700 | [method parameters: {}]
+2018-06-30 22:41:00,059 | client           | INFO     | PID=30700 | [Received: 161063752 bytes (161063752 raw bytes)] [Duration: 88.27653193473816 seconds] [Bitrate: 14596291.763620492 bit/s]
+2018-06-30 22:41:00,059 | client           | INFO     | PID=30700 | Socket closed
+2018-06-30 22:41:00,536 | client           | INFO     | PID=30705 | [Received: 161055608 bytes (161055608 raw bytes)] [Duration: 88.7558228969574 seconds] [Bitrate: 14516736.163844058 bit/s]
+2018-06-30 22:41:00,536 | client           | INFO     | PID=30705 | Socket closed
+2018-06-30 22:41:01,341 | client           | INFO     | PID=30703 | [Received: 161063802 bytes (161063802 raw bytes)] [Duration: 89.55665993690491 seconds] [Bitrate: 14387656.003560098 bit/s]
+2018-06-30 22:41:01,341 | client           | INFO     | PID=30703 | Socket closed
+2018-06-30 22:41:02,206 | client           | INFO     | PID=30701 | [Received: 161058644 bytes (161058644 raw bytes)] [Duration: 90.4228241443634 seconds] [Bitrate: 14249379.669262609 bit/s]
+2018-06-30 22:41:02,207 | client           | INFO     | PID=30701 | Socket closed
+2018-06-30 22:41:02,954 | client           | INFO     | PID=30702 | [Received: 161052645 bytes (161052645 raw bytes)] [Duration: 91.17257595062256 seconds] [Bitrate: 14131674.426943755 bit/s]
+2018-06-30 22:41:02,954 | client           | INFO     | PID=30702 | Socket closed
+2018-06-30 22:41:05,468 | client           | INFO     | PID=30704 | [Received: 161059989 bytes (161059989 raw bytes)] [Duration: 93.68950200080872 seconds] [Bitrate: 13752660.484724084 bit/s]
+2018-06-30 22:41:05,468 | client           | INFO     | PID=30704 | Socket closed
+2018-06-30 22:41:05,784 | client           | INFO     | PID=30699 | [SUMMARY] [Received: 966354440 bytes (100.000% of 966354440 raw bytes)] [Duration: 93.68950200080872 seconds] [Bitrate: 82515493.78427978 bit/s]
+
+ Performance counter stats for 'CPU(s) 1-2':
+
+     188463.082392      task-clock (msec)         #    2.000 CPUs utilized            (100.00%)
+             3,918      context-switches          #    0.021 K/sec                    (100.00%)
+                 1      cpu-migrations            #    0.000 K/sec                    (100.00%)
+         1,240,086      page-faults               #    0.007 M/sec                  
+    33,957,618,641      cycles                    #    0.180 GHz                      (100.00%)
+   <not supported>      stalled-cycles-frontend  
+   <not supported>      stalled-cycles-backend   
+    83,873,242,569      instructions              #    2.47  insns per cycle          (100.00%)
+    21,145,788,789      branches                  #  112.201 M/sec                    (100.00%)
+        33,537,868      branch-misses             #    0.16% of all branches        
+
+      94.235974091 seconds time elapsed
