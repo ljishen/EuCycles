@@ -1,0 +1,25 @@
+LC_NUMERIC=en_US.UTF8 perf stat -B -a taskset -c 2 /tmp/eucycles/pyben-nio/src/run --client start --addresses 10.10.1.2 --size 1GB --port 8881 --bind 10.10.1.1 --bufsize 50mb --method "raw"
+
+2018-07-02 05:42:18,083 | client           | INFO     | PID=30468 | [bufsize: 52428800 bytes]
+2018-07-02 05:42:18,107 | client           | INFO     | PID=30469 | Connecting to server 10.10.1.2 on port 8881
+2018-07-02 05:42:18,107 | client           | INFO     | PID=30469 | Connection established. Receiving data ...
+2018-07-02 05:42:18,107 | methods.raw      | INFO     | PID=30469 | [method: methods.raw]
+2018-07-02 05:42:18,108 | methods.raw      | INFO     | PID=30469 | [method parameters: {}]
+2018-07-02 05:50:55,846 | client           | INFO     | PID=30469 | [Received: 858995404 bytes (858995404 raw bytes)] [Duration: 517.7171709537506 seconds] [Bitrate: 13273585.690311003 bit/s]
+2018-07-02 05:50:55,846 | client           | INFO     | PID=30469 | Socket closed
+2018-07-02 05:50:56,995 | client           | INFO     | PID=30468 | [SUMMARY] [Received: 858995404 bytes (100.000% of 858995404 raw bytes)] [Duration: 517.7171709537506 seconds] [Bitrate: 13273585.690311003 bit/s]
+
+ Performance counter stats for 'system wide':
+
+    1556842.246986      task-clock (msec)         #    3.000 CPUs utilized            (100.00%)
+         1,094,310      context-switches          #    0.703 K/sec                    (100.00%)
+             2,147      cpu-migrations            #    0.001 K/sec                    (100.00%)
+         1,146,956      page-faults               #    0.737 K/sec                  
+    58,270,149,615      cycles                    #    0.037 GHz                      (100.00%)
+   <not supported>      stalled-cycles-frontend  
+   <not supported>      stalled-cycles-backend   
+    97,678,228,911      instructions              #    1.68  insns per cycle          (100.00%)
+    23,864,914,908      branches                  #   15.329 M/sec                    (100.00%)
+        67,579,070      branch-misses             #    0.28% of all branches        
+
+     518.986866136 seconds time elapsed

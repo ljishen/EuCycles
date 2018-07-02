@@ -1,0 +1,49 @@
+LC_NUMERIC=en_US.UTF8 perf stat -B -a taskset -c 2 /tmp/eucycles/pyben-nio/src/run --client start --addresses 10.10.1.2  10.10.1.3  10.10.1.4  10.10.1.5  10.10.1.6 --size 1GB --port 8881 --bind 10.10.1.1 --bufsize 50mb --method "raw"
+
+2018-07-01 19:10:42,344 | client           | INFO     | PID=17077 | [bufsize: 52428800 bytes]
+2018-07-01 19:10:42,375 | client           | INFO     | PID=17080 | Connecting to server 10.10.1.2 on port 8881
+2018-07-01 19:10:42,375 | client           | INFO     | PID=17081 | Connecting to server 10.10.1.3 on port 8881
+2018-07-01 19:10:42,376 | client           | INFO     | PID=17080 | Connection established. Receiving data ...
+2018-07-01 19:10:42,376 | methods.raw      | INFO     | PID=17080 | [method: methods.raw]
+2018-07-01 19:10:42,376 | methods.raw      | INFO     | PID=17080 | [method parameters: {}]
+2018-07-01 19:10:42,379 | client           | INFO     | PID=17081 | Connection established. Receiving data ...
+2018-07-01 19:10:42,379 | methods.raw      | INFO     | PID=17081 | [method: methods.raw]
+2018-07-01 19:10:42,380 | methods.raw      | INFO     | PID=17081 | [method parameters: {}]
+2018-07-01 19:10:42,384 | client           | INFO     | PID=17082 | Connecting to server 10.10.1.4 on port 8881
+2018-07-01 19:10:42,384 | client           | INFO     | PID=17079 | Connecting to server 10.10.1.5 on port 8881
+2018-07-01 19:10:42,385 | client           | INFO     | PID=17082 | Connection established. Receiving data ...
+2018-07-01 19:10:42,385 | methods.raw      | INFO     | PID=17082 | [method: methods.raw]
+2018-07-01 19:10:42,385 | methods.raw      | INFO     | PID=17082 | [method parameters: {}]
+2018-07-01 19:10:42,387 | client           | INFO     | PID=17079 | Connection established. Receiving data ...
+2018-07-01 19:10:42,387 | methods.raw      | INFO     | PID=17079 | [method: methods.raw]
+2018-07-01 19:10:42,388 | methods.raw      | INFO     | PID=17079 | [method parameters: {}]
+2018-07-01 19:10:42,391 | client           | INFO     | PID=17078 | Connecting to server 10.10.1.6 on port 8881
+2018-07-01 19:10:42,392 | client           | INFO     | PID=17078 | Connection established. Receiving data ...
+2018-07-01 19:10:42,392 | methods.raw      | INFO     | PID=17078 | [method: methods.raw]
+2018-07-01 19:10:42,392 | methods.raw      | INFO     | PID=17078 | [method parameters: {}]
+2018-07-01 19:12:14,502 | client           | INFO     | PID=17078 | [Received: 0 bytes (0 raw bytes)] [Duration: 92.02150011062622 seconds] [Bitrate: 0.0 bit/s]
+2018-07-01 19:12:14,503 | client           | INFO     | PID=17078 | Socket closed
+2018-07-01 19:12:14,990 | client           | INFO     | PID=17081 | [Received: 0 bytes (0 raw bytes)] [Duration: 92.50668001174927 seconds] [Bitrate: 0.0 bit/s]
+2018-07-01 19:12:14,990 | client           | INFO     | PID=17081 | Socket closed
+2018-07-01 19:12:15,117 | client           | INFO     | PID=17082 | [Received: 0 bytes (0 raw bytes)] [Duration: 92.63769793510437 seconds] [Bitrate: 0.0 bit/s]
+2018-07-01 19:12:15,117 | client           | INFO     | PID=17082 | Socket closed
+2018-07-01 19:12:15,313 | client           | INFO     | PID=17079 | [Received: 0 bytes (0 raw bytes)] [Duration: 92.83682799339294 seconds] [Bitrate: 0.0 bit/s]
+2018-07-01 19:12:15,313 | client           | INFO     | PID=17079 | Socket closed
+2018-07-01 19:12:16,171 | client           | INFO     | PID=17080 | [Received: 0 bytes (0 raw bytes)] [Duration: 93.68882703781128 seconds] [Bitrate: 0.0 bit/s]
+2018-07-01 19:12:16,171 | client           | INFO     | PID=17080 | Socket closed
+2018-07-01 19:12:16,187 | client           | INFO     | PID=17077 | [SUMMARY] [Received: 0 bytes] [Duration: 93.6949999332428 seconds] [Bitrate: 0.0 bit/s]
+
+ Performance counter stats for 'system wide':
+
+     281730.981720      task-clock (msec)         #    3.000 CPUs utilized            (100.00%)
+           198,311      context-switches          #    0.704 K/sec                    (100.00%)
+               380      cpu-migrations            #    0.001 K/sec                    (100.00%)
+            75,111      page-faults               #    0.267 K/sec                  
+     5,889,229,441      cycles                    #    0.021 GHz                      (100.00%)
+   <not supported>      stalled-cycles-frontend  
+   <not supported>      stalled-cycles-backend   
+     4,848,960,641      instructions              #    0.82  insns per cycle          (100.00%)
+     1,036,109,043      branches                  #    3.678 M/sec                    (100.00%)
+        10,658,461      branch-misses             #    1.03% of all branches        
+
+      93.917295510 seconds time elapsed

@@ -1,0 +1,25 @@
+LC_NUMERIC=en_US.UTF8 perf stat -B -a taskset -c 2 /tmp/eucycles/pyben-nio/src/run --client start --addresses 10.10.1.2 --size 1GB --port 8881 --bind 10.10.1.1 --bufsize 50mb --method "raw"
+
+2018-07-01 17:58:09,498 | client           | INFO     | PID=5780 | [bufsize: 52428800 bytes]
+2018-07-01 17:58:09,525 | client           | INFO     | PID=5781 | Connecting to server 10.10.1.2 on port 8881
+2018-07-01 17:58:09,526 | client           | INFO     | PID=5781 | Connection established. Receiving data ...
+2018-07-01 17:58:09,526 | methods.raw      | INFO     | PID=5781 | [method: methods.raw]
+2018-07-01 17:58:09,526 | methods.raw      | INFO     | PID=5781 | [method parameters: {}]
+2018-07-01 18:06:03,829 | client           | INFO     | PID=5781 | [Received: 0 bytes (0 raw bytes)] [Duration: 474.2819221019745 seconds] [Bitrate: 0.0 bit/s]
+2018-07-01 18:06:03,829 | client           | INFO     | PID=5781 | Socket closed
+2018-07-01 18:06:03,860 | client           | INFO     | PID=5780 | [SUMMARY] [Received: 0 bytes] [Duration: 474.2819221019745 seconds] [Bitrate: 0.0 bit/s]
+
+ Performance counter stats for 'system wide':
+
+    1423210.483321      task-clock (msec)         #    3.000 CPUs utilized            (100.00%)
+         1,005,618      context-switches          #    0.707 K/sec                    (100.00%)
+             2,039      cpu-migrations            #    0.001 K/sec                    (100.00%)
+            23,232      page-faults               #    0.016 K/sec                  
+    27,179,789,838      cycles                    #    0.019 GHz                      (100.00%)
+   <not supported>      stalled-cycles-frontend  
+   <not supported>      stalled-cycles-backend   
+    22,240,035,247      instructions              #    0.82  insns per cycle          (100.00%)
+     4,781,008,747      branches                  #    3.359 M/sec                    (100.00%)
+        43,395,939      branch-misses             #    0.91% of all branches        
+
+     474.439543888 seconds time elapsed

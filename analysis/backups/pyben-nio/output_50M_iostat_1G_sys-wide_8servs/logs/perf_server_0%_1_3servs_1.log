@@ -1,0 +1,26 @@
+LC_NUMERIC=en_US.UTF8 perf stat -B -a taskset -c 2 /tmp/eucycles/pyben-nio/src/run --server start --bind 10.10.1.3 --size 357913941 --port 8881 --filename /tmp/eucycles/data_file --bufsize 50mb --method "match; func=lambda v: int(chr(v)) < 0; sztype=BEFORE"
+
+2018-07-01 18:10:55,781 | server           | INFO     | PID=3867 | [bufsize: 52428800 bytes] [zerocopy: False]
+2018-07-01 18:10:55,795 | methods.match    | INFO     | PID=3867 | [method: methods.match]
+2018-07-01 18:10:55,795 | methods.match    | INFO     | PID=3867 | [method parameters: {'mpws': '50MB', 'sztype': 'BEFORE', 'func': 'lambda v: int(chr(v)) < 0'}]
+2018-07-01 18:10:55,816 | methods.match    | INFO     | PID=3867 | Start 1 process to handle data filtering
+2018-07-01 18:10:55,816 | server           | INFO     | PID=3867 | Ready to send 357913941 bytes using data file size of 1073741824 bytes
+2018-07-01 18:10:55,816 | server           | INFO     | PID=3867 | Listening socket bound to port 8881
+2018-07-01 18:11:01,403 | server           | INFO     | PID=3867 | Accepted incoming connection ('10.10.1.1', 37171) from client. Sending data ...
+2018-07-01 18:13:37,361 | server           | INFO     | PID=3867 | [SUMMARY] [Sent: 0 bytes] [Read: 0 bytes (0.000% of 357913941 raw bytes)] [Duration: 155.95771098136902 seconds] [Bitrate: 0.0 bit/s]
+2018-07-01 18:13:37,361 | server           | INFO     | PID=3867 | Resources closed, now exiting
+
+ Performance counter stats for 'system wide':
+
+     485127.062990      task-clock (msec)         #    3.000 CPUs utilized            (100.00%)
+            42,353      context-switches          #    0.087 K/sec                    (100.00%)
+               525      cpu-migrations            #    0.001 K/sec                    (100.00%)
+            19,217      page-faults               #    0.040 K/sec                  
+   402,482,632,294      cycles                    #    0.830 GHz                      (100.00%)
+   <not supported>      stalled-cycles-frontend  
+   <not supported>      stalled-cycles-backend   
+   986,247,347,644      instructions              #    2.45  insns per cycle          (100.00%)
+   201,706,410,832      branches                  #  415.781 M/sec                    (100.00%)
+        42,618,494      branch-misses             #    0.02% of all branches        
+
+     161.717926591 seconds time elapsed

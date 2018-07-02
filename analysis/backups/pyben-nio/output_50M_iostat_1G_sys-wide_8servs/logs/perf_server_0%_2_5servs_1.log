@@ -1,0 +1,26 @@
+LC_NUMERIC=en_US.UTF8 perf stat -B -a taskset -c 2 /tmp/eucycles/pyben-nio/src/run --server start --bind 10.10.1.3 --size 214748365 --port 8881 --filename /tmp/eucycles/data_file --bufsize 50mb --method "match; func=lambda v: int(chr(v)) < 0; sztype=BEFORE"
+
+2018-07-01 18:43:38,234 | server           | INFO     | PID=5267 | [bufsize: 52428800 bytes] [zerocopy: False]
+2018-07-01 18:43:38,248 | methods.match    | INFO     | PID=5267 | [method: methods.match]
+2018-07-01 18:43:38,249 | methods.match    | INFO     | PID=5267 | [method parameters: {'func': 'lambda v: int(chr(v)) < 0', 'sztype': 'BEFORE', 'mpws': '50MB'}]
+2018-07-01 18:43:38,269 | methods.match    | INFO     | PID=5267 | Start 1 process to handle data filtering
+2018-07-01 18:43:38,269 | server           | INFO     | PID=5267 | Ready to send 214748365 bytes using data file size of 1073741824 bytes
+2018-07-01 18:43:38,269 | server           | INFO     | PID=5267 | Listening socket bound to port 8881
+2018-07-01 18:43:46,354 | server           | INFO     | PID=5267 | Accepted incoming connection ('10.10.1.1', 40901) from client. Sending data ...
+2018-07-01 18:45:18,491 | server           | INFO     | PID=5267 | [SUMMARY] [Sent: 0 bytes] [Read: 0 bytes (0.000% of 214748365 raw bytes)] [Duration: 92.13650107383728 seconds] [Bitrate: 0.0 bit/s]
+2018-07-01 18:45:18,491 | server           | INFO     | PID=5267 | Resources closed, now exiting
+
+ Performance counter stats for 'system wide':
+
+     301163.563019      task-clock (msec)         #    3.000 CPUs utilized            (100.00%)
+            26,436      context-switches          #    0.088 K/sec                    (100.00%)
+               162      cpu-migrations            #    0.001 K/sec                    (100.00%)
+            19,019      page-faults               #    0.063 K/sec                  
+   237,990,085,218      cycles                    #    0.790 GHz                      (100.00%)
+   <not supported>      stalled-cycles-frontend  
+   <not supported>      stalled-cycles-backend   
+   589,581,076,239      instructions              #    2.48  insns per cycle          (100.00%)
+   120,639,589,449      branches                  #  400.578 M/sec                    (100.00%)
+        26,790,819      branch-misses             #    0.02% of all branches        
+
+     100.393300540 seconds time elapsed

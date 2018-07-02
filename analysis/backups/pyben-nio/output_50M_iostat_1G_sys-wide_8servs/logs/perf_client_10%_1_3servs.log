@@ -1,0 +1,37 @@
+LC_NUMERIC=en_US.UTF8 perf stat -B -a taskset -c 2 /tmp/eucycles/pyben-nio/src/run --client start --addresses 10.10.1.2  10.10.1.3  10.10.1.4 --size 1GB --port 8881 --bind 10.10.1.1 --bufsize 50mb --method "raw"
+
+2018-07-01 19:30:24,241 | client           | INFO     | PID=20691 | [bufsize: 52428800 bytes]
+2018-07-01 19:30:24,268 | client           | INFO     | PID=20694 | Connecting to server 10.10.1.2 on port 8881
+2018-07-01 19:30:24,268 | client           | INFO     | PID=20693 | Connecting to server 10.10.1.3 on port 8881
+2018-07-01 19:30:24,269 | client           | INFO     | PID=20694 | Connection established. Receiving data ...
+2018-07-01 19:30:24,269 | methods.raw      | INFO     | PID=20694 | [method: methods.raw]
+2018-07-01 19:30:24,269 | methods.raw      | INFO     | PID=20694 | [method parameters: {}]
+2018-07-01 19:30:24,275 | client           | INFO     | PID=20693 | Connection established. Receiving data ...
+2018-07-01 19:30:24,275 | methods.raw      | INFO     | PID=20693 | [method: methods.raw]
+2018-07-01 19:30:24,276 | methods.raw      | INFO     | PID=20693 | [method parameters: {}]
+2018-07-01 19:30:24,279 | client           | INFO     | PID=20692 | Connecting to server 10.10.1.4 on port 8881
+2018-07-01 19:30:24,280 | client           | INFO     | PID=20692 | Connection established. Receiving data ...
+2018-07-01 19:30:24,280 | methods.raw      | INFO     | PID=20692 | [method: methods.raw]
+2018-07-01 19:30:24,280 | methods.raw      | INFO     | PID=20692 | [method parameters: {}]
+2018-07-01 19:32:43,670 | client           | INFO     | PID=20694 | [Received: 35795554 bytes (35795554 raw bytes)] [Duration: 139.34785318374634 seconds] [Bitrate: 2055032.9657565318 bit/s]
+2018-07-01 19:32:43,670 | client           | INFO     | PID=20694 | Socket closed
+2018-07-01 19:32:46,132 | client           | INFO     | PID=20692 | [Received: 35784134 bytes (35784134 raw bytes)] [Duration: 141.79923605918884 seconds] [Bitrate: 2018861.877933573 bit/s]
+2018-07-01 19:32:46,132 | client           | INFO     | PID=20692 | Socket closed
+2018-07-01 19:32:47,765 | client           | INFO     | PID=20693 | [Received: 35788115 bytes (35788115 raw bytes)] [Duration: 143.4379060268402 seconds] [Bitrate: 1996019.935946544 bit/s]
+2018-07-01 19:32:47,765 | client           | INFO     | PID=20693 | Socket closed
+2018-07-01 19:32:47,935 | client           | INFO     | PID=20691 | [SUMMARY] [Received: 107367803 bytes (100.000% of 107367803 raw bytes)] [Duration: 143.44292211532593 seconds] [Bitrate: 5988043.267198805 bit/s]
+
+ Performance counter stats for 'system wide':
+
+     431272.959390      task-clock (msec)         #    3.000 CPUs utilized            (100.00%)
+           303,141      context-switches          #    0.703 K/sec                    (100.00%)
+               616      cpu-migrations            #    0.001 K/sec                    (100.00%)
+           272,942      page-faults               #    0.633 K/sec                  
+    12,587,343,367      cycles                    #    0.029 GHz                      (100.00%)
+   <not supported>      stalled-cycles-frontend  
+   <not supported>      stalled-cycles-backend   
+    15,982,600,211      instructions              #    1.27  insns per cycle          (100.00%)
+     3,868,201,370      branches                  #    8.969 M/sec                    (100.00%)
+        17,626,143      branch-misses             #    0.46% of all branches        
+
+     143.768428452 seconds time elapsed
