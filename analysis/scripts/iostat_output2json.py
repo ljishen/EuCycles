@@ -73,8 +73,16 @@ def __calc_sum_of_busyness(
         if end_time_str in line:
             return sum_of_busyness
 
-    raise RuntimeError('Unable to find the end timestamp %r \
-in iostat log file %r' % (end_time_str, iostat_log_filename))
+    err_msg_tmpl = 'Unable to find the {0!s} timestamp {1!r} \
+in iostat log file {2!r}'
+    if not in_section:
+        err_msg = err_msg_tmpl.format(
+            'start', start_time_str, iostat_log_filename)
+    else:
+        err_msg = err_msg_tmpl.format(
+            'end', end_time_str, iostat_log_filename)
+
+    raise RuntimeError(err_msg)
 
 
 PATTERN_PYBEN_NIO_TIME = re.compile(
