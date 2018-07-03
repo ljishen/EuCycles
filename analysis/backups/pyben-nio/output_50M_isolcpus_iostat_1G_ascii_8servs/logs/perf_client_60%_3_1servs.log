@@ -1,0 +1,25 @@
+LC_NUMERIC=en_US.UTF8 perf stat -B -C 1-2 taskset -c 2 /tmp/eucycles/pyben-nio/src/run --client start --addresses 10.10.1.2 --size 1GB --port 8881 --bind 10.10.1.1 --bufsize 50mb --method "raw"
+
+2018-07-03 05:35:05,845 | client           | INFO     | PID=2067 | [bufsize: 52428800 bytes]
+2018-07-03 05:35:05,869 | client           | INFO     | PID=2068 | Connecting to server 10.10.1.2 on port 8881
+2018-07-03 05:35:05,870 | client           | INFO     | PID=2068 | Connection established. Receiving data ...
+2018-07-03 05:35:05,870 | methods.raw      | INFO     | PID=2068 | [method: methods.raw]
+2018-07-03 05:35:05,870 | methods.raw      | INFO     | PID=2068 | [method parameters: {}]
+2018-07-03 05:39:08,592 | client           | INFO     | PID=2068 | [Received: 644260845 bytes (644260845 raw bytes)] [Duration: 242.7006859779358 seconds] [Bitrate: 21236391.398039 bit/s]
+2018-07-03 05:39:08,592 | client           | INFO     | PID=2068 | Socket closed
+2018-07-03 05:39:09,770 | client           | INFO     | PID=2067 | [SUMMARY] [Received: 644260845 bytes (100.000% of 644260845 raw bytes)] [Duration: 242.7006859779358 seconds] [Bitrate: 21236391.398039 bit/s]
+
+ Performance counter stats for 'CPU(s) 1-2':
+
+     487989.597071      task-clock (msec)         #    2.000 CPUs utilized            (100.00%)
+             6,253      context-switches          #    0.013 K/sec                    (100.00%)
+                 1      cpu-migrations            #    0.000 K/sec                    (100.00%)
+         1,126,560      page-faults               #    0.002 M/sec                  
+    24,022,283,921      cycles                    #    0.049 GHz                      (100.00%)
+   <not supported>      stalled-cycles-frontend  
+   <not supported>      stalled-cycles-backend   
+    55,122,009,645      instructions              #    2.29  insns per cycle          (100.00%)
+    14,276,541,635      branches                  #   29.256 M/sec                    (100.00%)
+        20,092,398      branch-misses             #    0.14% of all branches        
+
+     243.999718171 seconds time elapsed

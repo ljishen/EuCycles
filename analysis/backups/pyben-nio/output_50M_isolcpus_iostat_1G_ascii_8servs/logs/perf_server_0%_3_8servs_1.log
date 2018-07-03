@@ -1,0 +1,26 @@
+LC_NUMERIC=en_US.UTF8 perf stat -B -C 1-2 taskset -c 2 /tmp/eucycles/pyben-nio/src/run --server start --bind 10.10.1.3 --size 134217728 --port 8881 --filename /tmp/eucycles/data_file --bufsize 50mb --method "match; func=lambda v: v - 48 < 0; sztype=BEFORE"
+
+2018-07-03 01:26:07,168 | server           | INFO     | PID=6978 | [bufsize: 52428800 bytes] [zerocopy: False]
+2018-07-03 01:26:07,182 | methods.match    | INFO     | PID=6978 | [method: methods.match]
+2018-07-03 01:26:07,182 | methods.match    | INFO     | PID=6978 | [method parameters: {'mpws': '50MB', 'sztype': 'BEFORE', 'func': 'lambda v: v - 48 < 0'}]
+2018-07-03 01:26:07,203 | methods.match    | INFO     | PID=6978 | Start 1 process to handle data filtering
+2018-07-03 01:26:07,203 | server           | INFO     | PID=6978 | Ready to send 134217728 bytes using data file size of 1073741824 bytes
+2018-07-03 01:26:07,203 | server           | INFO     | PID=6978 | Listening socket bound to port 8881
+2018-07-03 01:26:19,251 | server           | INFO     | PID=6978 | Accepted incoming connection ('10.10.1.1', 52328) from client. Sending data ...
+2018-07-03 01:26:38,075 | server           | INFO     | PID=6978 | [SUMMARY] [Sent: 0 bytes] [Read: 0 bytes (0.000% of 134217728 raw bytes)] [Duration: 18.824599027633667 seconds] [Bitrate: 0.0 bit/s]
+2018-07-03 01:26:38,076 | server           | INFO     | PID=6978 | Resources closed, now exiting
+
+ Performance counter stats for 'CPU(s) 1-2':
+
+      62080.398447      task-clock (msec)         #    2.000 CPUs utilized            (100.00%)
+             2,530      context-switches          #    0.041 K/sec                    (100.00%)
+                 1      cpu-migrations            #    0.000 K/sec                    (100.00%)
+            16,046      page-faults               #    0.258 K/sec                  
+    47,945,195,210      cycles                    #    0.772 GHz                      (100.00%)
+   <not supported>      stalled-cycles-frontend  
+   <not supported>      stalled-cycles-backend   
+   146,260,857,427      instructions              #    3.05  insns per cycle          (100.00%)
+    26,784,557,110      branches                  #  431.450 M/sec                    (100.00%)
+        16,263,618      branch-misses             #    0.06% of all branches        
+
+      31.042723657 seconds time elapsed

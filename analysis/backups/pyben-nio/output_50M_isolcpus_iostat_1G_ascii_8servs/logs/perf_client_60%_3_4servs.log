@@ -1,0 +1,43 @@
+LC_NUMERIC=en_US.UTF8 perf stat -B -C 1-2 taskset -c 2 /tmp/eucycles/pyben-nio/src/run --client start --addresses 10.10.1.2  10.10.1.3  10.10.1.4  10.10.1.5 --size 1GB --port 8881 --bind 10.10.1.1 --bufsize 50mb --method "raw"
+
+2018-07-03 05:44:11,148 | client           | INFO     | PID=3353 | [bufsize: 52428800 bytes]
+2018-07-03 05:44:11,177 | client           | INFO     | PID=3357 | Connecting to server 10.10.1.2 on port 8881
+2018-07-03 05:44:11,178 | client           | INFO     | PID=3356 | Connecting to server 10.10.1.3 on port 8881
+2018-07-03 05:44:11,178 | client           | INFO     | PID=3355 | Connecting to server 10.10.1.4 on port 8881
+2018-07-03 05:44:11,179 | client           | INFO     | PID=3357 | Connection established. Receiving data ...
+2018-07-03 05:44:11,179 | methods.raw      | INFO     | PID=3357 | [method: methods.raw]
+2018-07-03 05:44:11,179 | methods.raw      | INFO     | PID=3357 | [method parameters: {}]
+2018-07-03 05:44:11,182 | client           | INFO     | PID=3356 | Connection established. Receiving data ...
+2018-07-03 05:44:11,182 | methods.raw      | INFO     | PID=3356 | [method: methods.raw]
+2018-07-03 05:44:11,182 | methods.raw      | INFO     | PID=3356 | [method parameters: {}]
+2018-07-03 05:44:11,186 | client           | INFO     | PID=3355 | Connection established. Receiving data ...
+2018-07-03 05:44:11,186 | methods.raw      | INFO     | PID=3355 | [method: methods.raw]
+2018-07-03 05:44:11,186 | methods.raw      | INFO     | PID=3355 | [method parameters: {}]
+2018-07-03 05:44:11,190 | client           | INFO     | PID=3354 | Connecting to server 10.10.1.5 on port 8881
+2018-07-03 05:44:11,194 | client           | INFO     | PID=3354 | Connection established. Receiving data ...
+2018-07-03 05:44:11,194 | methods.raw      | INFO     | PID=3354 | [method: methods.raw]
+2018-07-03 05:44:11,194 | methods.raw      | INFO     | PID=3354 | [method parameters: {}]
+2018-07-03 05:45:14,289 | client           | INFO     | PID=3354 | [Received: 161053941 bytes (161053941 raw bytes)] [Duration: 63.025274991989136 seconds] [Bitrate: 20443092.523813136 bit/s]
+2018-07-03 05:45:14,289 | client           | INFO     | PID=3354 | Socket closed
+2018-07-03 05:45:14,349 | client           | INFO     | PID=3356 | [Received: 161042799 bytes (161042799 raw bytes)] [Duration: 63.08797216415405 seconds] [Bitrate: 20421363.182315487 bit/s]
+2018-07-03 05:45:14,349 | client           | INFO     | PID=3356 | Socket closed
+2018-07-03 05:45:14,916 | client           | INFO     | PID=3357 | [Received: 161067739 bytes (161067739 raw bytes)] [Duration: 63.65619993209839 seconds] [Bitrate: 20242205.99681537 bit/s]
+2018-07-03 05:45:14,917 | client           | INFO     | PID=3357 | Socket closed
+2018-07-03 05:45:15,218 | client           | INFO     | PID=3355 | [Received: 161051005 bytes (161051005 raw bytes)] [Duration: 63.95638918876648 seconds] [Bitrate: 20145102.87935862 bit/s]
+2018-07-03 05:45:15,219 | client           | INFO     | PID=3355 | Socket closed
+2018-07-03 05:45:15,585 | client           | INFO     | PID=3353 | [SUMMARY] [Received: 644215484 bytes (100.000% of 644215484 raw bytes)] [Duration: 63.95832014083862 seconds] [Bitrate: 80579412.66517486 bit/s]
+
+ Performance counter stats for 'CPU(s) 1-2':
+
+     129021.104093      task-clock (msec)         #    2.000 CPUs utilized            (100.00%)
+             3,300      context-switches          #    0.026 K/sec                    (100.00%)
+                 1      cpu-migrations            #    0.000 K/sec                    (100.00%)
+         1,202,178      page-faults               #    0.009 M/sec                  
+    25,149,207,490      cycles                    #    0.195 GHz                      (100.00%)
+   <not supported>      stalled-cycles-frontend  
+   <not supported>      stalled-cycles-backend   
+    55,554,158,298      instructions              #    2.21  insns per cycle          (100.00%)
+    14,347,514,442      branches                  #  111.203 M/sec                    (100.00%)
+        19,694,920      branch-misses             #    0.14% of all branches        
+
+      64.511725438 seconds time elapsed
