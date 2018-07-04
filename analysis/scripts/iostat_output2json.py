@@ -143,8 +143,10 @@ Please check if you are pointing to the correct work_dir.")
         perf_profile_file = logs_dir + '/' + filename
         raw_times, host_ip = __extract_from_perf_profile(perf_profile_file)
 
-        start_time_str = __get_time_str_in_perf_profile(raw_times[0], -1)
-        end_time_str = __get_time_str_in_perf_profile(raw_times[-1], 2)
+        # generate the start and end time string before and after 2 seconds
+        # of the first and last timestamps in the corresponding perf profile.
+        start_time_str = __get_time_str_in_perf_profile(raw_times[0], -2)
+        end_time_str = __get_time_str_in_perf_profile(raw_times[-1], 3)
         print(perf_profile_file,
               ': [', start_time_str,
               '-',
