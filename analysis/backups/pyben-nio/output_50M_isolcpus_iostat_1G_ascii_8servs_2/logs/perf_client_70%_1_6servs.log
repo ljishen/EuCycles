@@ -1,0 +1,55 @@
+LC_NUMERIC=en_US.UTF8 perf stat -B -C 1-2 taskset -c 2 /tmp/eucycles/pyben-nio/src/run --client start --addresses 10.10.1.2  10.10.1.3  10.10.1.4  10.10.1.5  10.10.1.6  10.10.1.7 --size 1GB --port 8881 --bind 10.10.1.1 --bufsize 50mb --method "raw"
+
+2018-07-04 19:00:38,695 | client           | INFO     | PID=23490 | [bufsize: 52428800 bytes]
+2018-07-04 19:00:38,727 | client           | INFO     | PID=23494 | Connecting to server 10.10.1.2 on port 8881
+2018-07-04 19:00:38,727 | client           | INFO     | PID=23493 | Connecting to server 10.10.1.3 on port 8881
+2018-07-04 19:00:38,728 | client           | INFO     | PID=23494 | Connection established. Receiving data ...
+2018-07-04 19:00:38,728 | methods.raw      | INFO     | PID=23494 | [method: methods.raw]
+2018-07-04 19:00:38,728 | methods.raw      | INFO     | PID=23494 | [method parameters: {}]
+2018-07-04 19:00:38,734 | client           | INFO     | PID=23493 | Connection established. Receiving data ...
+2018-07-04 19:00:38,734 | methods.raw      | INFO     | PID=23493 | [method: methods.raw]
+2018-07-04 19:00:38,734 | methods.raw      | INFO     | PID=23493 | [method parameters: {}]
+2018-07-04 19:00:38,738 | client           | INFO     | PID=23495 | Connecting to server 10.10.1.4 on port 8881
+2018-07-04 19:00:38,738 | client           | INFO     | PID=23495 | Connection established. Receiving data ...
+2018-07-04 19:00:38,739 | methods.raw      | INFO     | PID=23495 | [method: methods.raw]
+2018-07-04 19:00:38,739 | methods.raw      | INFO     | PID=23495 | [method parameters: {}]
+2018-07-04 19:00:38,742 | client           | INFO     | PID=23496 | Connecting to server 10.10.1.5 on port 8881
+2018-07-04 19:00:38,742 | client           | INFO     | PID=23496 | Connection established. Receiving data ...
+2018-07-04 19:00:38,742 | methods.raw      | INFO     | PID=23496 | [method: methods.raw]
+2018-07-04 19:00:38,743 | methods.raw      | INFO     | PID=23496 | [method parameters: {}]
+2018-07-04 19:00:38,746 | client           | INFO     | PID=23492 | Connecting to server 10.10.1.6 on port 8881
+2018-07-04 19:00:38,747 | client           | INFO     | PID=23491 | Connecting to server 10.10.1.7 on port 8881
+2018-07-04 19:00:38,747 | client           | INFO     | PID=23492 | Connection established. Receiving data ...
+2018-07-04 19:00:38,747 | methods.raw      | INFO     | PID=23492 | [method: methods.raw]
+2018-07-04 19:00:38,748 | methods.raw      | INFO     | PID=23492 | [method parameters: {}]
+2018-07-04 19:00:38,750 | client           | INFO     | PID=23491 | Connection established. Receiving data ...
+2018-07-04 19:00:38,750 | methods.raw      | INFO     | PID=23491 | [method: methods.raw]
+2018-07-04 19:00:38,750 | methods.raw      | INFO     | PID=23491 | [method parameters: {}]
+2018-07-04 19:01:23,254 | client           | INFO     | PID=23495 | [Received: 125259083 bytes (125259083 raw bytes)] [Duration: 44.402589082717896 seconds] [Bitrate: 22567888.150243487 bit/s]
+2018-07-04 19:01:23,254 | client           | INFO     | PID=23495 | Socket closed
+2018-07-04 19:01:23,535 | client           | INFO     | PID=23496 | [Received: 125265630 bytes (125265630 raw bytes)] [Duration: 44.68210005760193 seconds] [Bitrate: 22427885.858276814 bit/s]
+2018-07-04 19:01:23,535 | client           | INFO     | PID=23496 | Socket closed
+2018-07-04 19:01:23,937 | client           | INFO     | PID=23493 | [Received: 125253844 bytes (125253844 raw bytes)] [Duration: 45.08033490180969 seconds] [Bitrate: 22227668.7647184 bit/s]
+2018-07-04 19:01:23,937 | client           | INFO     | PID=23493 | Socket closed
+2018-07-04 19:01:24,445 | client           | INFO     | PID=23494 | [Received: 125271359 bytes (125271359 raw bytes)] [Duration: 45.59565210342407 seconds] [Bitrate: 21979527.120848887 bit/s]
+2018-07-04 19:01:24,445 | client           | INFO     | PID=23494 | Socket closed
+2018-07-04 19:01:24,919 | client           | INFO     | PID=23491 | [Received: 125272953 bytes (125272953 raw bytes)] [Duration: 46.06188893318176 seconds] [Bitrate: 21757327.96051387 bit/s]
+2018-07-04 19:01:24,920 | client           | INFO     | PID=23491 | Socket closed
+2018-07-04 19:01:25,283 | client           | INFO     | PID=23492 | [Received: 125271204 bytes (125271204 raw bytes)] [Duration: 46.42824983596802 seconds] [Bitrate: 21585341.58708731 bit/s]
+2018-07-04 19:01:25,284 | client           | INFO     | PID=23492 | Socket closed
+2018-07-04 19:01:25,547 | client           | INFO     | PID=23490 | [SUMMARY] [Received: 751594073 bytes (100.000% of 751594073 raw bytes)] [Duration: 46.433837890625 seconds] [Bitrate: 129490751.94178545 bit/s]
+
+ Performance counter stats for 'CPU(s) 1-2':
+
+      93852.547044      task-clock (msec)         #    2.000 CPUs utilized            (100.00%)
+             3,160      context-switches          #    0.034 K/sec                    (100.00%)
+                 1      cpu-migrations            #    0.000 K/sec                    (100.00%)
+         1,246,488      page-faults               #    0.013 M/sec                  
+    26,571,505,370      cycles                    #    0.283 GHz                      (100.00%)
+   <not supported>      stalled-cycles-frontend  
+   <not supported>      stalled-cycles-backend   
+    64,732,213,957      instructions              #    2.44  insns per cycle          (100.00%)
+    16,537,955,715      branches                  #  176.212 M/sec                    (100.00%)
+        25,468,986      branch-misses             #    0.15% of all branches        
+
+      46.927078188 seconds time elapsed

@@ -1,0 +1,26 @@
+LC_NUMERIC=en_US.UTF8 perf stat -B -C 1-2 taskset -c 2 /tmp/eucycles/pyben-nio/src/run --server start --bind 10.10.1.4 --size 134217728 --port 8881 --filename /tmp/eucycles/data_file --bufsize 50mb --method "match; func=lambda v: v - 48 < 5; sztype=BEFORE"
+
+2018-07-04 17:40:27,604 | server           | INFO     | PID=32483 | [bufsize: 52428800 bytes] [zerocopy: False]
+2018-07-04 17:40:27,619 | methods.match    | INFO     | PID=32483 | [method: methods.match]
+2018-07-04 17:40:27,619 | methods.match    | INFO     | PID=32483 | [method parameters: {'mpws': '50MB', 'func': 'lambda v: v - 48 < 5', 'sztype': 'BEFORE'}]
+2018-07-04 17:40:27,640 | methods.match    | INFO     | PID=32483 | Start 1 process to handle data filtering
+2018-07-04 17:40:27,640 | server           | INFO     | PID=32483 | Ready to send 134217728 bytes using data file size of 1073741824 bytes
+2018-07-04 17:40:27,640 | server           | INFO     | PID=32483 | Listening socket bound to port 8881
+2018-07-04 17:40:38,555 | server           | INFO     | PID=32483 | Accepted incoming connection ('10.10.1.1', 46734) from client. Sending data ...
+2018-07-04 17:41:10,207 | server           | INFO     | PID=32483 | [SUMMARY] [Sent: 67098552 bytes] [Read: 67098552 bytes (49.992% of 134217728 raw bytes)] [Duration: 31.65143084526062 seconds] [Bitrate: 16959372.820277315 bit/s]
+2018-07-04 17:41:10,207 | server           | INFO     | PID=32483 | Resources closed, now exiting
+
+ Performance counter stats for 'CPU(s) 1-2':
+
+      85478.649588      task-clock (msec)         #    2.000 CPUs utilized            (100.00%)
+             2,680      context-switches          #    0.031 K/sec                    (100.00%)
+                 1      cpu-migrations            #    0.000 K/sec                    (100.00%)
+            41,804      page-faults               #    0.489 K/sec                  
+    74,569,728,682      cycles                    #    0.872 GHz                      (100.00%)
+   <not supported>      stalled-cycles-frontend  
+   <not supported>      stalled-cycles-backend   
+   205,096,958,288      instructions              #    2.75  insns per cycle          (100.00%)
+    38,805,187,549      branches                  #  453.975 M/sec                    (100.00%)
+        85,186,221      branch-misses             #    0.22% of all branches        
+
+      42.739581696 seconds time elapsed

@@ -1,0 +1,55 @@
+LC_NUMERIC=en_US.UTF8 perf stat -B -C 1-2 taskset -c 2 /tmp/eucycles/pyben-nio/src/run --client start --addresses 10.10.1.2  10.10.1.3  10.10.1.4  10.10.1.5  10.10.1.6  10.10.1.7 --size 1GB --port 8881 --bind 10.10.1.1 --bufsize 50mb --method "raw"
+
+2018-07-04 17:37:48,041 | client           | INFO     | PID=485 | [bufsize: 52428800 bytes]
+2018-07-04 17:37:48,073 | client           | INFO     | PID=489 | Connecting to server 10.10.1.2 on port 8881
+2018-07-04 17:37:48,073 | client           | INFO     | PID=488 | Connecting to server 10.10.1.3 on port 8881
+2018-07-04 17:37:48,074 | client           | INFO     | PID=489 | Connection established. Receiving data ...
+2018-07-04 17:37:48,074 | methods.raw      | INFO     | PID=489 | [method: methods.raw]
+2018-07-04 17:37:48,074 | methods.raw      | INFO     | PID=489 | [method parameters: {}]
+2018-07-04 17:37:48,078 | client           | INFO     | PID=488 | Connection established. Receiving data ...
+2018-07-04 17:37:48,078 | methods.raw      | INFO     | PID=488 | [method: methods.raw]
+2018-07-04 17:37:48,078 | methods.raw      | INFO     | PID=488 | [method parameters: {}]
+2018-07-04 17:37:48,082 | client           | INFO     | PID=490 | Connecting to server 10.10.1.4 on port 8881
+2018-07-04 17:37:48,083 | client           | INFO     | PID=491 | Connecting to server 10.10.1.5 on port 8881
+2018-07-04 17:37:48,083 | client           | INFO     | PID=491 | Connection established. Receiving data ...
+2018-07-04 17:37:48,083 | methods.raw      | INFO     | PID=491 | [method: methods.raw]
+2018-07-04 17:37:48,084 | methods.raw      | INFO     | PID=491 | [method parameters: {}]
+2018-07-04 17:37:48,086 | client           | INFO     | PID=490 | Connection established. Receiving data ...
+2018-07-04 17:37:48,086 | methods.raw      | INFO     | PID=490 | [method: methods.raw]
+2018-07-04 17:37:48,086 | methods.raw      | INFO     | PID=490 | [method parameters: {}]
+2018-07-04 17:37:48,090 | client           | INFO     | PID=487 | Connecting to server 10.10.1.6 on port 8881
+2018-07-04 17:37:48,091 | client           | INFO     | PID=486 | Connecting to server 10.10.1.7 on port 8881
+2018-07-04 17:37:48,091 | client           | INFO     | PID=487 | Connection established. Receiving data ...
+2018-07-04 17:37:48,091 | methods.raw      | INFO     | PID=487 | [method: methods.raw]
+2018-07-04 17:37:48,092 | methods.raw      | INFO     | PID=487 | [method parameters: {}]
+2018-07-04 17:37:48,094 | client           | INFO     | PID=486 | Connection established. Receiving data ...
+2018-07-04 17:37:48,094 | methods.raw      | INFO     | PID=486 | [method: methods.raw]
+2018-07-04 17:37:48,094 | methods.raw      | INFO     | PID=486 | [method parameters: {}]
+2018-07-04 17:38:26,815 | client           | INFO     | PID=488 | [Received: 89457759 bytes (89457759 raw bytes)] [Duration: 38.614039182662964 seconds] [Bitrate: 18533727.29577899 bit/s]
+2018-07-04 17:38:26,816 | client           | INFO     | PID=488 | Socket closed
+2018-07-04 17:38:27,688 | client           | INFO     | PID=486 | [Received: 89483419 bytes (89483419 raw bytes)] [Duration: 39.48824405670166 seconds] [Bitrate: 18128619.519573398 bit/s]
+2018-07-04 17:38:27,689 | client           | INFO     | PID=486 | Socket closed
+2018-07-04 17:38:27,882 | client           | INFO     | PID=491 | [Received: 89475589 bytes (89475589 raw bytes)] [Duration: 39.67895984649658 seconds] [Bitrate: 18039906.156038042 bit/s]
+2018-07-04 17:38:27,883 | client           | INFO     | PID=491 | Socket closed
+2018-07-04 17:38:28,237 | client           | INFO     | PID=490 | [Received: 89464236 bytes (89464236 raw bytes)] [Duration: 40.034627199172974 seconds] [Bitrate: 17877371.117740422 bit/s]
+2018-07-04 17:38:28,237 | client           | INFO     | PID=490 | Socket closed
+2018-07-04 17:38:28,597 | client           | INFO     | PID=489 | [Received: 89479697 bytes (89479697 raw bytes)] [Duration: 40.39846706390381 seconds] [Bitrate: 17719424.226361394 bit/s]
+2018-07-04 17:38:28,598 | client           | INFO     | PID=489 | Socket closed
+2018-07-04 17:38:28,907 | client           | INFO     | PID=487 | [Received: 89478785 bytes (89478785 raw bytes)] [Duration: 40.70304489135742 seconds] [Bitrate: 17586651.856406793 bit/s]
+2018-07-04 17:38:28,907 | client           | INFO     | PID=487 | Socket closed
+2018-07-04 17:38:29,132 | client           | INFO     | PID=485 | [SUMMARY] [Received: 536839485 bytes (100.000% of 536839485 raw bytes)] [Duration: 40.707823038101196 seconds] [Bitrate: 105500996.11026327 bit/s]
+
+ Performance counter stats for 'CPU(s) 1-2':
+
+      82329.092569      task-clock (msec)         #    2.000 CPUs utilized            (100.00%)
+             2,459      context-switches          #    0.030 K/sec                    (100.00%)
+                 1      cpu-migrations            #    0.000 K/sec                    (100.00%)
+         1,218,059      page-faults               #    0.015 M/sec                  
+    19,612,594,673      cycles                    #    0.238 GHz                      (100.00%)
+   <not supported>      stalled-cycles-frontend  
+   <not supported>      stalled-cycles-backend   
+    45,589,016,417      instructions              #    2.32  insns per cycle          (100.00%)
+    11,941,769,503      branches                  #  145.049 M/sec                    (100.00%)
+        17,544,617      branch-misses             #    0.15% of all branches        
+
+      41.165233163 seconds time elapsed
