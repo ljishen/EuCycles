@@ -73,8 +73,8 @@ def __calc_sum_of_busyness(
         if end_time_str in line:
             return sum_of_busyness
 
-    err_msg_tmpl = 'Unable to find the {0!s} timestamp {1!r} \
-in iostat log file {2!r}'
+    err_msg_tmpl = 'Unable to find the {} timestamp {!r} \
+in iostat log file {!r}'
     if not in_section:
         err_msg = err_msg_tmpl.format(
             'start', start_time_str, iostat_log_filename)
