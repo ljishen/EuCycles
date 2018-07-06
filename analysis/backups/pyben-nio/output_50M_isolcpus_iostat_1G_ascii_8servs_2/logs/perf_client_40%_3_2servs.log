@@ -1,0 +1,31 @@
+LC_NUMERIC=en_US.UTF8 perf stat -B -C 1-2 taskset -c 2 /tmp/eucycles/pyben-nio/src/run --client start --addresses 10.10.1.3  10.10.1.4 --size 1GB --port 8881 --bind 10.10.1.2 --bufsize 50mb --cache 0b --method "raw"
+
+2018-07-06 05:03:02,515 | client           | INFO     | PID=25106 | [bufsize: 52428800 bytes]
+2018-07-06 05:03:02,541 | client           | INFO     | PID=25108 | Connecting to server 10.10.1.3 on port 8881
+2018-07-06 05:03:02,541 | client           | INFO     | PID=25107 | Connecting to server 10.10.1.4 on port 8881
+2018-07-06 05:03:02,541 | client           | INFO     | PID=25108 | Connection established. Receiving data ...
+2018-07-06 05:03:02,541 | methods.raw      | INFO     | PID=25108 | [method: methods.raw]
+2018-07-06 05:03:02,542 | methods.raw      | INFO     | PID=25108 | [method parameters: {}]
+2018-07-06 05:03:02,548 | client           | INFO     | PID=25107 | Connection established. Receiving data ...
+2018-07-06 05:03:02,548 | methods.raw      | INFO     | PID=25107 | [method: methods.raw]
+2018-07-06 05:03:02,549 | methods.raw      | INFO     | PID=25107 | [method parameters: {}]
+2018-07-06 05:04:47,877 | client           | INFO     | PID=25108 | [Received: 214754394 bytes (214754394 raw bytes)] [Duration: 105.29834604263306 seconds] [Bitrate: 16315879.750897551 bit/s]
+2018-07-06 05:04:47,877 | client           | INFO     | PID=25108 | Socket closed
+2018-07-06 05:04:50,984 | client           | INFO     | PID=25107 | [Received: 214722999 bytes (214722999 raw bytes)] [Duration: 108.40051794052124 seconds] [Bitrate: 15846640.07733375 bit/s]
+2018-07-06 05:04:50,984 | client           | INFO     | PID=25107 | Socket closed
+2018-07-06 05:04:51,060 | client           | INFO     | PID=25106 | [SUMMARY] [Received: 429477393 bytes (100.000% of 429477393 raw bytes)] [Duration: 108.40586400032043 seconds] [Bitrate: 31694034.042197607 bit/s]
+
+ Performance counter stats for 'CPU(s) 1-2':
+
+     217235.175698      task-clock (msec)         #    2.000 CPUs utilized            (100.00%)
+             4,647      context-switches          #    0.021 K/sec                    (100.00%)
+                 1      cpu-migrations            #    0.000 K/sec                    (100.00%)
+            34,938      page-faults               #    0.161 K/sec                  
+     2,904,651,315      cycles                    #    0.013 GHz                      (100.00%)
+   <not supported>      stalled-cycles-frontend  
+   <not supported>      stalled-cycles-backend   
+     1,462,330,461      instructions              #    0.50  insns per cycle          (100.00%)
+       301,188,823      branches                  #    1.386 M/sec                    (100.00%)
+         6,154,163      branch-misses             #    2.04% of all branches        
+
+     108.618639685 seconds time elapsed
