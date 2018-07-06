@@ -18,7 +18,7 @@
       async: 30
       # we poll the result so that we know it fails if we didn't have write permission on {{ workdir }}
       poll: 1
-    - name: install perf and iostat
+    - name: install perf and sysstat
       become: yes
       apt:
         install_recommends: no
@@ -122,25 +122,25 @@
 
 - hosts: all
   vars:
-    iostat_log_file: "{{ workdir }}/{{ iostat_log_filename }}.{{ inventory_hostname }}"
-    iostat_pid_file: "{{ workdir }}/{{ iostat_pid_filename }}"
+    cpustat_log_file: "{{ workdir }}/{{ cpustat_log_filename }}.{{ inventory_hostname }}"
+    cpustat_pid_file: "{{ workdir }}/{{ cpustat_pid_filename }}"
   tasks:
-    - name: backup {{ iostat_log_file }}
+    - name: backup {{ cpustat_log_file }}
       copy:
         backup: yes
         content: ""
-        dest: "{{ iostat_log_file }}"
+        dest: "{{ cpustat_log_file }}"
         force: yes
-    - name: stop iostat daemon if necessary
-      shell: kill $(cat {{ iostat_pid_file }}) ; rm {{ iostat_pid_file }}
+    - name: stop cpustat daemon if necessary
+      shell: kill $(cat {{ cpustat_pid_file }}) ; rm {{ cpustat_pid_file }}
       args:
-        removes: "{{ iostat_pid_file }}"
-    - name: run iostat as daemon
+        removes: "{{ cpustat_pid_file }}"
+    - name: run cpustat as daemon
       # we use stdbuf to turn off the buffering of the output redirection.
       #   https://linux.die.net/man/1/stdbuf
       #   https://stackoverflow.com/a/1429973
       shell: >
-        nohup stdbuf -oL -eL iostat -y -c -t 1 > {{ iostat_log_file }} 2>&1 & echo $! > {{ iostat_pid_file }}
+        nohup stdbuf -oL -eL {{ cpustat_command }} > {{ cpustat_log_file }} 2>&1 & echo $! > {{ cpustat_pid_file }}
 
 - name: run bench
   hosts: localhost
@@ -152,20 +152,20 @@
 
 - hosts: all
   vars:
-    iostat_logs_dir: "{{ playbook_dir }}/output/logs/iostat/"
-    iostat_pid_file: "{{ workdir }}/{{ iostat_pid_filename }}"
+    cpustat_logs_dir: "{{ playbook_dir }}/output/logs/cpustat/"
+    cpustat_pid_file: "{{ workdir }}/{{ cpustat_pid_filename }}"
   tasks:
-    - name: ensure the presence of {{ iostat_logs_dir }}
+    - name: ensure the presence of {{ cpustat_logs_dir }}
       file:
-        path: "{{ iostat_logs_dir }}"
+        path: "{{ cpustat_logs_dir }}"
         state: directory
-    - name: stop iostat daemon
-      shell: kill $(cat {{ iostat_pid_file }}) ; rm {{ iostat_pid_file }}
+    - name: stop cpustat daemon
+      shell: kill $(cat {{ cpustat_pid_file }}) ; rm {{ cpustat_pid_file }}
       args:
-        removes: "{{ iostat_pid_file }}"
-    - name: collect iostat logs
+        removes: "{{ cpustat_pid_file }}"
+    - name: collect cpustat logs
       fetch:
-        dest: "{{ iostat_logs_dir }}"
+        dest: "{{ cpustat_logs_dir }}"
         fail_on_missing: yes
         flat: yes
-        src: "{{ workdir }}/{{ iostat_log_filename }}.{{ inventory_hostname }}"
+        src: "{{ workdir }}/{{ cpustat_log_filename }}.{{ inventory_hostname }}"
